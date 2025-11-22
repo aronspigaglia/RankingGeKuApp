@@ -1,0 +1,80 @@
+using System.Text;
+using Backend_RankingGeKu.Models;
+
+namespace Backend_RankingGeKu.Services;
+
+public class LatexBuilder
+{
+    public string BuildMany(List<(string Title, List<AthleteDto> Data)> sections)
+    {
+        var body = new StringBuilder();
+        for (int i = 0; i < sections.Count; i++)
+        {
+            var (title, data) = sections[i];
+
+            body.AppendLine($@"
+{{\LARGE \textbf{{{E(title)}}}}}\par\vspace{{6mm}}
+
+\begin{{longtable}}{{|p{{3.0cm}}|p{{3.0cm}}|p{{1.0cm}}|p{{5.0cm}}|p{{1.2cm}}|p{{1.5cm}}|p{{1.8cm}}|}}
+\hline
+\textbf{{Nachname}} & \textbf{{Vorname}} & \textbf{{JG}} & \textbf{{Verein}} & \textbf{{Kat.}} & \textbf{{D-Note}} & \textbf{{END-Note}} \\
+\hline
+\endhead
+{MakeRows(data)}
+\hline
+\end{{longtable}}
+");
+
+            if (i < sections.Count - 1)
+                body.AppendLine(@"\newpage");
+        }
+
+        return WrapDocument(body.ToString());
+    }
+    
+    private static string WrapDocument(string body) => 
+$@"\documentclass[a4paper,10pt,landscape]{{article}}
+\usepackage[margin=15mm]{{geometry}}
+\usepackage{{booktabs,longtable}}
+\usepackage[T1]{{fontenc}}
+\usepackage[utf8]{{inputenc}}
+\usepackage[ngerman]{{babel}}
+\usepackage{{helvet}}
+\renewcommand\familydefault{{\sfdefault}}
+\setlength{{\parindent}}{{0pt}}
+\renewcommand\arraystretch{{1.8}} % Zeilenhöhe
+\setlength\tabcolsep{{6pt}}      % Zellabstand
+
+\begin{{document}}
+{body}
+\end{{document}}";
+
+    private static string MakeRows(List<AthleteDto> data)
+    {
+        if (data.Count == 0)
+            return @"\multicolumn{7}{|c|}{\emph{(keine Einträge)}} \\ \hline";
+
+        var sb = new StringBuilder();
+        foreach (var a in data)
+        {
+            sb.AppendLine($"{E(a.Nachname)} & {E(a.Vorname)} & {E(a.JG)} & {E(a.Verein)} & {E(a.Kat)} & & \\\\ \\hline");
+        }
+        return sb.ToString();
+    }
+
+    private static string E(string? s)
+    {
+        if (string.IsNullOrEmpty(s)) return "";
+        return s
+            .Replace(@"\", @"\textbackslash{}")
+            .Replace("&", @"\&")
+            .Replace("%", @"\%")
+            .Replace("$", @"\$")
+            .Replace("#", @"\#")
+            .Replace("_", @"\_")
+            .Replace("{", @"\{")
+            .Replace("}", @"\}")
+            .Replace("~", @"\textasciitilde{}")
+            .Replace("^", @"\textasciicircum{}");
+    }
+}
