@@ -1,0 +1,61 @@
+{
+  "name": "rankinggekuapp",
+  "version": "1.0.0",
+  "description": "ranking-app",
+  "license": "MIT",
+  "author": "Aron Spigaglia",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+
+    "build:frontend": "cd ../Frontend_RankingGeKu && ng build --configuration production",
+
+    "build:backend:mac": "cd ../solBackend_RankingGeKu && dotnet publish Backend_RankingGeKu/Backend_RankingGeKu.csproj -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ../rankingGeKuAppElectron/app/backend",
+    "build:app:mac": "npm run build:frontend && npm run build:backend:mac",
+
+    "build:backend:win": "cd ../solBackend_RankingGeKu && dotnet publish Backend_RankingGeKu/Backend_RankingGeKu.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ../rankingGeKuAppElectron/app/backend",
+    "build:app:win": "npm run build:frontend && npm run build:backend:win",
+
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "electron:prod": "cross-env NODE_ENV=production electron .",
+
+    "make:mac": "npm run build:app:mac && electron-forge make"
+  },
+    "build": {
+    "appId": "ch.ranking.geku.app",
+    "productName": "RankingGeKu",
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icons/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icons/icon.png"
+    },
+    "files": [
+      "main.js",
+      "app/**/*",
+      "package.json",
+      "assets/icons/**/*"
+    ]
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-deb": "^7.10.2",
+    "@electron-forge/maker-rpm": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
+    "@electron-forge/plugin-fuses": "^7.10.2",
+    "@electron/fuses": "^1.8.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.1"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1"
+  }
+}
