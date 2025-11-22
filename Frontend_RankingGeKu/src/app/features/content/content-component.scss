@@ -1,0 +1,24 @@
+.app-content {
+  min-height: calc(100vh - 64px);
+  background-color: #fff;
+}
+
+/* Fixed 3 columns; grows rows as needed based on groups count */
+.sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.sheet-box {
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: .5rem;
+  padding: 1rem;
+  background: #fdfdfd;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+
+/* Remove number spinners (we use text with decimal inputmode) */
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.no-spinners { -moz-appearance: textfield; }
