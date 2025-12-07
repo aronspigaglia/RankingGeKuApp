@@ -12,6 +12,72 @@ public class PdfCompiler
         _enginePath = enginePath;
     }
 
+    /// <summary>
+    /// Prefer a bundled Tectonic (app/backend/tectonic/<platform>/tectonic[.exe]),
+    /// fall back to an explicitly configured path, then PATH lookup ("tectonic").
+    /// </summary>
+    public static string ResolveEnginePath(string? configuredPath = null)
+    {
+        // Explicit config overrides everything
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return configuredPath;
+        }
+
+        var exeName = OperatingSystem.IsWindows() ? "tectonic.exe" : "tectonic";
+        string? platform = null;
+
+        if (OperatingSystem.IsWindows()) platform = "windows";
+        else if (OperatingSystem.IsMacOS()) platform = "macos";
+        else if (OperatingSystem.IsLinux()) platform = "linux";
+
+        // Probe a few likely roots (AppContext + process location) to be robust in packaged apps
+        var candidates = new List<string>();
+        if (!string.IsNullOrWhiteSpace(AppContext.BaseDirectory))
+            candidates.Add(AppContext.BaseDirectory);
+
+        var processDir = Path.GetDirectoryName(Environment.ProcessPath);
+        if (!string.IsNullOrWhiteSpace(processDir))
+            candidates.Add(processDir);
+
+        foreach (var baseDir in candidates)
+        {
+            if (platform is not null)
+            {
+                var bundled = Path.Combine(baseDir, "tectonic", platform, exeName);
+                if (File.Exists(bundled))
+                {
+                    Console.WriteLine($"[PDF] Using bundled Tectonic at {bundled}");
+                    return bundled;
+                }
+            }
+        }
+
+        // Fallback: try to locate any tectonic* nearby (helps if platform folder is missing)
+        foreach (var baseDir in candidates)
+        {
+            try
+            {
+                var probe = Directory
+                    .EnumerateFiles(baseDir, "tectonic*", SearchOption.AllDirectories)
+                    .FirstOrDefault(File.Exists);
+                if (probe is not null)
+                {
+                    Console.WriteLine($"[PDF] Using discovered Tectonic at {probe}");
+                    return probe;
+                }
+            }
+            catch
+            {
+                // ignore probing errors
+            }
+        }
+
+        // Fallback: rely on PATH
+        Console.WriteLine("[PDF] Using Tectonic from PATH");
+        return "tectonic";
+    }
+
     public async Task<byte[]> CompileAsync(string latexSource, CancellationToken ct = default)
     {
         var workdir = Directory.CreateTempSubdirectory("notesheets_");

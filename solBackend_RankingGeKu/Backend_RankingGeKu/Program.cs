@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // DI
-var enginePath = builder.Configuration.GetSection("Pdf")["EnginePath"] ?? "tectonic";
+var enginePath = PdfCompiler.ResolveEnginePath(builder.Configuration.GetSection("Pdf")["EnginePath"]);
 builder.Services.AddSingleton(new PdfCompiler(enginePath));
 builder.Services.AddSingleton<CsvParser>();
 builder.Services.AddSingleton<LatexBuilder>();
