@@ -84,8 +84,14 @@ public class PdfCompiler
         var texPath = Path.Combine(workdir.FullName, "notesheets.tex");
         await File.WriteAllTextAsync(texPath, latexSource);
 
-        // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden
-        var cacheDir = Path.Combine(AppContext.BaseDirectory, "tectonic-cache");
+        // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden.
+        // Pro Plattform ein eigener Unterordner, damit macOS/Windows/Linux sich nicht in die Quere kommen.
+        var cacheRoot = Path.Combine(AppContext.BaseDirectory, "tectonic-cache");
+        var cachePlatform = OperatingSystem.IsWindows() ? "windows"
+            : OperatingSystem.IsMacOS() ? "macos"
+            : OperatingSystem.IsLinux() ? "linux"
+            : "generic";
+        var cacheDir = Path.Combine(cacheRoot, cachePlatform);
         Directory.CreateDirectory(cacheDir);
 
         var psi = new ProcessStartInfo

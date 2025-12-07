@@ -14,7 +14,7 @@ Die Backend-Logik sucht zuerst hier (AppContext.BaseDirectory/tectonic/<platform
 Nach dem Einlegen der Binaries: `chmod +x macos/tectonic` bzw. `chmod +x linux/tectonic` nicht vergessen, bevor du packst.
 
 Tectonic-Cache vorwärmen (optional, gegen langsamen ersten Start):
-- Lege einen Ordner `tectonic-cache` hier an.
-- Setze beim Aufruf `TECTONIC_CACHE_DIR=$PWD/tectonic-cache` (macOS/Linux) bzw. `set TECTONIC_CACHE_DIR=%cd%\\tectonic-cache` (Windows).
-- Rufe einmal ein Dummy-Dokument durch: `echo \"\\\\documentclass{article}\\\\begin{document}hi\\\\end{document}\" > /tmp/test.tex && TECTONIC_CACHE_DIR=$PWD/tectonic-cache ./tectonic/macos/tectonic /tmp/test.tex`
-- Danach den gefüllten `tectonic-cache/` im Repo lassen; der Backend-Code verwendet ihn automatisch.
+- Lege je Plattform einen Unterordner an, z.B. `tectonic-cache/macos` bzw. `tectonic-cache/windows`.
+- macOS/Linux: `TECTONIC_CACHE_DIR=$PWD/tectonic-cache/macos ./tectonic/macos/tectonic /tmp/test.tex`
+- Windows: `set TECTONIC_CACHE_DIR=%cd%\\tectonic-cache\\windows` und `.\tectonic\windows\tectonic.exe %TEMP%\test.tex`
+- Danach die gefüllten Ordner im Repo lassen; der Backend-Code wählt automatisch den passenden Unterordner.
