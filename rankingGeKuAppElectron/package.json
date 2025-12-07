@@ -1,6 +1,6 @@
 {
   "name": "rankinggekuapp",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "description": "ranking-app",
   "license": "MIT",
   "author": "Aron Spigaglia",
@@ -10,21 +10,16 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-
     "build:frontend": "cd ../Frontend_RankingGeKu && ng build --configuration production",
-
     "build:backend:mac": "cd ../solBackend_RankingGeKu && dotnet publish Backend_RankingGeKu/Backend_RankingGeKu.csproj -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ../rankingGeKuAppElectron/app/backend",
     "build:app:mac": "npm run build:frontend && npm run build:backend:mac",
-
     "build:backend:win": "cd ../solBackend_RankingGeKu && dotnet publish Backend_RankingGeKu/Backend_RankingGeKu.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ../rankingGeKuAppElectron/app/backend",
     "build:app:win": "npm run build:frontend && npm run build:backend:win",
-
     "electron:dev": "cross-env NODE_ENV=development electron .",
     "electron:prod": "cross-env NODE_ENV=production electron .",
-
     "make:mac": "npm run build:app:mac && electron-forge make"
   },
-    "build": {
+  "build": {
     "appId": "ch.ranking.geku.app",
     "productName": "RankingGeKu",
     "mac": {
