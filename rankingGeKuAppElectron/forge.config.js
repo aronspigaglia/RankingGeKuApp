@@ -2,11 +2,29 @@ const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
+const entitlementsPath = path.join(__dirname, 'entitlements.plist');
+
 module.exports = {
   packagerConfig: {
     asar: true,
     // Icon für App (macOS .icns, Windows .ico) – basename ohne Endung
     icon: path.join(__dirname, 'assets', 'icons', 'icon'),
+    // macOS: Signieren + Notarisieren (Zertifikate + Notary-Creds per ENV)
+    osxSign: {
+      identity: process.env.APPLE_IDENTITY || 'Developer ID Application',
+      hardenedRuntime: true,
+      entitlements: entitlementsPath,
+      'entitlements-inherit': entitlementsPath,
+      gatekeeperAssess: false,
+    },
+    osxNotarize: {
+      tool: 'notarytool',
+      // Bevorzugt Keychain-Profile (z.B. "AC_PASSWORD"); fällt sonst auf ENV zurück
+      keychainProfile: process.env.APPLE_KEYCHAIN_PROFILE || 'AC_PASSWORD',
+      appleId: process.env.APPLE_ID,
+      appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
+      teamId: process.env.APPLE_TEAM_ID,
+    },
     /**
      * Zusätzliche Ressourcen, die neben der asar in die App gelegt werden.
      * Hier: das gepublishte .NET-Backend, das du nach app/backend ausgibst.
