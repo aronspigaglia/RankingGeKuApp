@@ -84,6 +84,10 @@ public class PdfCompiler
         var texPath = Path.Combine(workdir.FullName, "notesheets.tex");
         await File.WriteAllTextAsync(texPath, latexSource);
 
+        // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden
+        var cacheDir = Path.Combine(AppContext.BaseDirectory, "tectonic-cache");
+        Directory.CreateDirectory(cacheDir);
+
         var psi = new ProcessStartInfo
         {
             FileName = _enginePath,
@@ -93,6 +97,7 @@ public class PdfCompiler
             CreateNoWindow = true,
             WorkingDirectory = workdir.FullName
         };
+        psi.Environment["TECTONIC_CACHE_DIR"] = cacheDir;
 
         // tectonic Argumente
         psi.ArgumentList.Add(Path.GetFileName(texPath));
