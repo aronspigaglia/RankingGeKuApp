@@ -5,7 +5,7 @@ import { RankingRequestDto } from '../models/ranking-request';
 @Injectable({ providedIn: 'root' })
 export class NotesheetsApiService {
   // adjust if you use environments
-  private baseUrl = 'http://localhost:5157';
+  private baseUrl = 'http://127.0.0.1:5157';
 
   constructor(private http: HttpClient) {}
 

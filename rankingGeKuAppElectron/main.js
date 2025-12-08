@@ -46,7 +46,7 @@ function startBackend() {
     env.PATH = [brewPath, env.PATH].filter(Boolean).join(':');
   }
 
-  backendProcess = spawn(exePath, ['--urls', 'http://localhost:5157'], {
+  backendProcess = spawn(exePath, ['--urls', 'http://127.0.0.1:5157'], {
     cwd: backendPath,
     env
   });

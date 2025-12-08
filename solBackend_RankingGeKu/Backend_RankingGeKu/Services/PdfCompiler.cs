@@ -40,6 +40,10 @@ public class PdfCompiler
         if (!string.IsNullOrWhiteSpace(processDir))
             candidates.Add(processDir);
 
+        var cwd = Directory.GetCurrentDirectory();
+        if (!string.IsNullOrWhiteSpace(cwd))
+            candidates.Add(cwd);
+
         foreach (var baseDir in candidates)
         {
             if (platform is not null)
@@ -85,8 +89,14 @@ public class PdfCompiler
         await File.WriteAllTextAsync(texPath, latexSource);
 
         // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden.
+        // Basis: aktuelles WorkingDirectory (wird von Electron auf resources/backend gesetzt)
+        var cacheBase = Directory.GetCurrentDirectory();
+        if (string.IsNullOrWhiteSpace(cacheBase))
+            cacheBase = AppContext.BaseDirectory; // Fallback
+
+        // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden.
         // Pro Plattform ein eigener Unterordner, damit macOS/Windows/Linux sich nicht in die Quere kommen.
-        var cacheRoot = Path.Combine(AppContext.BaseDirectory, "tectonic-cache");
+        var cacheRoot = Path.Combine(cacheBase, "tectonic-cache");
         var cachePlatform = OperatingSystem.IsWindows() ? "windows"
             : OperatingSystem.IsMacOS() ? "macos"
             : OperatingSystem.IsLinux() ? "linux"
@@ -110,10 +120,22 @@ public class PdfCompiler
         psi.ArgumentList.Add("--keep-logs");
         psi.ArgumentList.Add("--keep-intermediates");
 
+        Console.WriteLine("[PDF] start tectonic");
         using var p = Process.Start(psi)!;
-        var stdout = await p.StandardOutput.ReadToEndAsync();
-        var stderr = await p.StandardError.ReadToEndAsync();
-        await p.WaitForExitAsync(ct);
+        var stdoutTask = p.StandardOutput.ReadToEndAsync();
+        var stderrTask = p.StandardError.ReadToEndAsync();
+
+        // auf Exit oder Timeout warten, um Hänger zu vermeiden
+        var finished = await Task.WhenAny(p.WaitForExitAsync(ct), Task.Delay(TimeSpan.FromSeconds(60), ct));
+        if (!p.HasExited)
+        {
+            try { p.Kill(true); } catch { /* ignore */ }
+            throw new Exception("Tectonic hang: aborted after 60s");
+        }
+
+        var stdout = await stdoutTask;
+        var stderr = await stderrTask;
+        Console.WriteLine($"[PDF] tectonic exit {p.ExitCode}");
 
         if (!string.IsNullOrWhiteSpace(stdout)) Console.WriteLine(stdout);
         if (!string.IsNullOrWhiteSpace(stderr)) Console.Error.WriteLine(stderr);
