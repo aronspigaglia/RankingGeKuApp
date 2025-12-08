@@ -1,6 +1,7 @@
 const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const pkg = require('./package.json');
 
 const entitlementsPath = path.join(__dirname, 'entitlements.plist');
 
@@ -38,7 +39,11 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',   // Windows-Installer (später)
-      config: {},
+      config: {
+        // Klarerer Dateiname für Windows-Installer
+        setupExe: 'RankingGeKu-win-x64-Setup.exe',
+        setupMsi: 'RankingGeKu-win-x64-Setup.msi',
+      },
     },
     {
       name: '@electron-forge/maker-zip',        // ZIP für macOS
@@ -69,4 +74,26 @@ module.exports = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  hooks: {
+    /**
+     * Benennt das macOS arm64 ZIP um, damit klar erkennbar ist, dass es fürs M‑Chip-Build ist.
+     */
+    async postMake(_forgeConfig, makeResults) {
+      const fs = require('fs/promises');
+      for (const result of makeResults) {
+        if (result.platform === 'darwin' && result.arch === 'arm64') {
+          for (let i = 0; i < result.artifacts.length; i++) {
+            const artifact = result.artifacts[i];
+            if (artifact.endsWith('.zip')) {
+              const dir = path.dirname(artifact);
+              const target = path.join(dir, `RankingGeKu-mac-m-chip-${pkg.version}.zip`);
+              await fs.rename(artifact, target);
+              result.artifacts[i] = target;
+              console.log(`Renamed mac artifact: ${path.basename(target)}`);
+            }
+          }
+        }
+      }
+    }
+  }
 };
