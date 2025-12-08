@@ -2,7 +2,7 @@
 
 ## Download und Start
 - **macOS (Apple Silicon)**: ZIP `RankingGeKu-mac-m-chip-<version>.zip` entpacken, App in Programme ziehen. Falls macOS blockt: Rechtsklick → Öffnen → Öffnen. Backend & Tectonic sind mitgeliefert, keine Zusatz-Installation nötig.
-- **macOS (Intel)**: ZIP `rankinggekuapp-darwin-x64-<version>.zip` entpacken und wie oben starten. Erster PDF-Lauf kann kurz dauern, falls kein vorgewärmter Cache beiliegt.
+- **macOS (Intel)**: Nicht verfügbar
 - **Windows**: `RankingGeKu-win-x64-Setup.exe` ausführen und installieren. Falls SmartScreen warnt: „Weitere Informationen“ → Trotzdem ausführen. Backend & Tectonic sind enthalten.
 
 ## CSV-Format (Athleten)
