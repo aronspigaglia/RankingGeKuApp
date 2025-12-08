@@ -1,7 +1,7 @@
 # RankingGeKu App – Download & CSV-Format
 
 ## Download und Start
-- **macOS (Apple Silicon)**: ZIP `RankingGeKu-mac-m-chip-<version>.zip` entpacken, App in Programme ziehen. Falls macOS blockt: Rechtsklick → Öffnen → Öffnen. Backend & Tectonic sind mitgeliefert, keine Zusatz-Installation nötig.
+- **macOS (Apple Silicon)**: ZIP `RankingGeKu-mac-m-chip-<version>.zip` entpacken, App nach `Programme` verschieben und von dort starten. Falls macOS blockt: Rechtsklick → Öffnen → Öffnen. Backend & Tectonic sind mitgeliefert, keine Zusatz-Installation nötig.
 - **macOS (Intel)**: Nicht verfügbar
 - **Windows**: `RankingGeKu-win-x64-Setup.exe` ausführen und installieren. Falls SmartScreen warnt: „Weitere Informationen“ → Trotzdem ausführen. Backend & Tectonic sind enthalten.
 

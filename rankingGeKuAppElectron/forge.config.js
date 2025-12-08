@@ -1,6 +1,8 @@
 const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+// Sign helper (macOS Binaries)
+const { sign } = require('@electron/osx-sign');
 const pkg = require('./package.json');
 
 const entitlementsPath = path.join(__dirname, 'entitlements.plist');
@@ -92,6 +94,27 @@ module.exports = {
               console.log(`Renamed mac artifact: ${path.basename(target)}`);
             }
           }
+        }
+      }
+    },
+        /**
+     * Signiert die eingebetteten Binaries (Backend + Tectonic), damit Gatekeeper sie nicht blockt.
+     */
+    async afterSign(context) {
+      if (context.electronPlatformName !== 'darwin') return;
+      const identity = process.env.APPLE_IDENTITY || 'Developer ID Application';
+      const appPath = path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
+      const bins = [
+        path.join(appPath, 'Contents/Resources/backend/Backend_RankingGeKu'),
+        path.join(appPath, 'Contents/Resources/backend/tectonic/macos/tectonic'),
+      ];
+      for (const file of bins) {
+        try {
+          await sign({ file, identity });
+          console.log(`Signed ${path.basename(file)}`);
+        } catch (e) {
+          console.error(`Signing failed for ${file}: ${e.message}`);
+          throw e;
         }
       }
     }
