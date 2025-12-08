@@ -142,3 +142,8 @@ vite.config.ts.timestamp-*
 
 # npm cache
 .npm-cache/
+
+# backend build output
+app/backend/Backend_RankingGeKu
+app/backend/Backend_RankingGeKu.exe
+app/backend/Backend_RankingGeKu.pdb
