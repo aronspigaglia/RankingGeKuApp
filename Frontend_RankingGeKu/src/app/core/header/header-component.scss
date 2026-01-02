@@ -1,5 +1,22 @@
-.navbar-brand img {
+.navbar-brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-brand .brand-logo {
   vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: black;
+  font-weight: 600;
+  font-size: 1.25rem;
 }
 
 .navbar-color {
