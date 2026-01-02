@@ -164,7 +164,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 
     var latex = $@"
 \documentclass[10pt]{{article}}
-\usepackage[a4paper,landscape,top=12mm,bottom=10mm,left=10mm,right=10mm,includefoot]{{geometry}}
+\usepackage[a4paper,landscape,top=12mm,bottom=18mm,left=10mm,right=10mm,includefoot]{{geometry}}
 \usepackage[T1]{{fontenc}}
 \usepackage[utf8]{{inputenc}}
 \usepackage[ngerman]{{babel}}
@@ -176,7 +176,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 \usepackage{{fancyhdr}}
 \setlength{{\headheight}}{{18mm}} % mehr Platz für größeres Header-Bild
 \setlength{{\headsep}}{{5mm}}     % Abstand zwischen Header und Inhalt
-\setlength{{\footskip}}{{10mm}}   % Footer näher am Inhalt (weiter von Seitenrand weg)
+\setlength{{\footskip}}{{10mm}}   % mehr Platz im Footer-Bereich
 \renewcommand{{\arraystretch}}{{1.3}} % mehr Zeilenabstand
 
 \renewcommand\familydefault{{\sfdefault}}
