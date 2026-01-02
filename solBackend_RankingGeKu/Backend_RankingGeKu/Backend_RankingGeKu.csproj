@@ -11,4 +11,12 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.16"/>
     </ItemGroup>
 
+    <!-- Logos für PDFs mitpublishen, damit \includegraphics funktioniert -->
+    <ItemGroup>
+        <Content Include="assets\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>
