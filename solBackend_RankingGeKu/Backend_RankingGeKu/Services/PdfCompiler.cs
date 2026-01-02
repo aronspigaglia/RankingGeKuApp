@@ -106,7 +106,7 @@ public class PdfCompiler
 
             if (assetsDir != null)
             {
-                foreach (var name in new[] { "geku-logo.png", "alltex-logo.png" })
+                foreach (var name in new[] { "geku-logo.png", "alltex-logo.png", "Schaerli_und_Partner-logo.png" })
                 {
                     var src = Path.Combine(assetsDir, name);
                     if (File.Exists(src))

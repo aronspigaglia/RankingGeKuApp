@@ -194,10 +194,11 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 \fancyhf{{}}
 \renewcommand{{\headrulewidth}}{{0pt}}
 \renewcommand{{\footrulewidth}}{{0pt}}
+\lhead{{\small {DateTime.UtcNow:dd.MM.yyyy}}}
 \rhead{{\includegraphics[height=14mm]{{{{geku-logo.png}}}}}}
-\lfoot{{\small Rangliste}}
-\cfoot{{\small Kutu}}
-\rfoot{{\includegraphics[height=10mm]{{{{alltex-logo.png}}}}}}
+\lfoot{{\small Geku Rickenbach 21/22 März 2026}}
+\cfoot{{\small www.geku.ch}}
+\rfoot{{\includegraphics[height=10mm]{{{{alltex-logo.png}}}}\hspace{{5mm}}\includegraphics[height=10mm]{{{{Schaerli_und_Partner-logo.png}}}}}}
 
 \begin{{document}}
 {bodyBuilder}

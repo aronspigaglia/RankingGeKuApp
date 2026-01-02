@@ -1,0 +1,247 @@
+{
+  "competitionName": "GeKu Rangliste",
+  "apparatus": [
+    "Boden",
+    "Pferd",
+    "Ring",
+    "Sprung",
+    "Barren",
+    "Reck"
+  ],
+  "athletes": [
+    {
+      "nachname": "Schwarzentruber",
+      "vorname": "Alessandro",
+      "jg": "2012",
+      "verein": "RLZ STV Neuenkirched",
+      "kat": "K1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "2",
+          "endNote": "10.35"
+        },
+        {
+          "dNote": "2",
+          "endNote": "10.70"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        },
+        {
+          "dNote": "1",
+          "endNote": "8.9"
+        },
+        {
+          "dNote": "1.3",
+          "endNote": "12.9"
+        },
+        {
+          "dNote": "1",
+          "endNote": "13.1"
+        }
+      ]
+    },
+    {
+      "nachname": "Meier",
+      "vorname": "Anna",
+      "jg": "2013",
+      "verein": "STV Sursee",
+      "kat": "K2",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "endNote": ""
+        },
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "nachname": "Hug",
+      "vorname": "Lara",
+      "jg": "2011",
+      "verein": "STV Beispiel",
+      "kat": "K3",
+      "groupIndex": 2,
+      "notes": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "nachname": "Kunzhendersmith von harlld",
+      "vorname": "Noah",
+      "jg": "2010",
+      "verein": "STV Beispiel",
+      "kat": "K3",
+      "groupIndex": 2,
+      "notes": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "nachname": "uster",
+      "vorname": "Max",
+      "jg": "2012",
+      "verein": "STV Rickenbach",
+      "kat": "K1",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "2",
+          "endNote": "10.20"
+        },
+        {
+          "dNote": "1",
+          "endNote": "9.50"
+        },
+        {
+          "dNote": "3",
+          "endNote": "8.10"
+        },
+        {
+          "dNote": "2.5",
+          "endNote": "10.50"
+        },
+        {
+          "dNote": "2",
+          "endNote": "10"
+        },
+        {
+          "dNote": "1",
+          "endNote": "10.30"
+        }
+      ]
+    },
+    {
+      "nachname": "eier",
+      "vorname": "Anna",
+      "jg": "2013",
+      "verein": "STV Sursee",
+      "kat": "K2",
+      "groupIndex": 3,
+      "notes": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "nachname": "ug",
+      "vorname": "Lara",
+      "jg": "2011",
+      "verein": "STV Beispiel",
+      "kat": "K3",
+      "groupIndex": 4,
+      "notes": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "nachname": "unz",
+      "vorname": "Noah",
+      "jg": "2010",
+      "verein": "STV Beispiel",
+      "kat": "K3",
+      "groupIndex": 4,
+      "notes": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "nachname": "Fischer",
+      "vorname": "Mia",
+      "jg": "2014",
+      "verein": "STV XY",
+      "kat": "K1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "2",
+          "endNote": "9"
+        },
+        {
+          "dNote": "1",
+          "endNote": "10.45"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.5"
+        },
+        {
+          "dNote": "2",
+          "endNote": "9.80"
+        },
+        {
+          "dNote": "2",
+          "endNote": "13.2"
+        },
+        {
+          "dNote": "1",
+          "endNote": "12"
+        }
+      ]
+    },
+    {
+      "nachname": "ischer",
+      "vorname": "Mia",
+      "jg": "2014",
+      "verein": "STV XY",
+      "kat": "K1",
+      "groupIndex": 6,
+      "notes": [
+        {
+          "dNote": "2",
+          "endNote": "8.50"
+        },
+        {
+          "dNote": "1",
+          "endNote": "9.70"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "12.45"
+        },
+        {
+          "dNote": "2",
+          "endNote": "12"
+        },
+        {
+          "dNote": "1",
+          "endNote": "11"
+        }
+      ]
+    }
+  ]
+}
