@@ -164,7 +164,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 
     var latex = $@"
 \documentclass[10pt]{{article}}
-\usepackage[a4paper,landscape,margin=10mm]{{geometry}}
+\usepackage[a4paper,landscape,top=12mm,bottom=10mm,left=10mm,right=10mm,includefoot]{{geometry}}
 \usepackage[T1]{{fontenc}}
 \usepackage[utf8]{{inputenc}}
 \usepackage[ngerman]{{babel}}
@@ -174,6 +174,9 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 \usepackage[table]{{xcolor}}
 \usepackage{{graphicx}}
 \usepackage{{fancyhdr}}
+\setlength{{\headheight}}{{18mm}} % mehr Platz für größeres Header-Bild
+\setlength{{\headsep}}{{5mm}}     % Abstand zwischen Header und Inhalt
+\setlength{{\footskip}}{{10mm}}   % Footer näher am Inhalt (weiter von Seitenrand weg)
 \renewcommand{{\arraystretch}}{{1.3}} % mehr Zeilenabstand
 
 \renewcommand\familydefault{{\sfdefault}}
@@ -191,7 +194,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 \fancyhf{{}}
 \renewcommand{{\headrulewidth}}{{0pt}}
 \renewcommand{{\footrulewidth}}{{0pt}}
-\rhead{{\includegraphics[height=12mm]{{{{geku-logo.png}}}}}}
+\rhead{{\includegraphics[height=14mm]{{{{geku-logo.png}}}}}}
 \lfoot{{\small Rangliste}}
 \cfoot{{\small Kutu}}
 \rfoot{{\includegraphics[height=10mm]{{{{alltex-logo.png}}}}}}
