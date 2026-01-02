@@ -13,9 +13,9 @@ public class LatexBuilder
             var (title, data) = sections[i];
 
             body.AppendLine($@"
-{{\LARGE \textbf{{{FormatTitle(title)}}}}}\par\vspace{{6mm}}
+{FormatTitle(title)}\par\vspace{{6mm}}
 
-\begin{{longtable}}{{|p{{3.0cm}}|p{{3.0cm}}|p{{1.0cm}}|p{{5.0cm}}|p{{1.2cm}}|p{{1.5cm}}|p{{1.8cm}}|}}
+\begin{{longtable}}{{|p{{3.5cm}}|p{{3.5cm}}|p{{1.2cm}}|p{{6.0cm}}|p{{1.4cm}}|p{{1.7cm}}|p{{2.2cm}}|}}
 \hline
 \textbf{{Nachname}} & \textbf{{Vorname}} & \textbf{{JG}} & \textbf{{Verein}} & \textbf{{Kat.}} & \textbf{{D-Note}} & \textbf{{END-Note}} \\
 \hline
@@ -34,7 +34,7 @@ public class LatexBuilder
     
     private static string WrapDocument(string body) => 
 $@"\documentclass[a4paper,10pt,landscape]{{article}}
-\usepackage[margin=15mm]{{geometry}}
+\usepackage[margin=12mm]{{geometry}}
 \usepackage{{booktabs,longtable}}
 \usepackage[T1]{{fontenc}}
 \usepackage[utf8]{{inputenc}}
@@ -43,7 +43,7 @@ $@"\documentclass[a4paper,10pt,landscape]{{article}}
 \renewcommand\familydefault{{\sfdefault}}
 \setlength{{\parindent}}{{0pt}}
 \renewcommand\arraystretch{{1.8}} % Zeilenhöhe
-\setlength\tabcolsep{{6pt}}      % Zellabstand
+\setlength\tabcolsep{{7pt}}      % Zellabstand (leicht größer)
 
 \begin{{document}}
 {body}
