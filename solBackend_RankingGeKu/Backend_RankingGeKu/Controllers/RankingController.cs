@@ -106,14 +106,14 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
     // Spalten: Rang, Ausz, Nachname, Vorname, Verein, JG, (E,D,(Rang))*6, Total
 
 
-    bodyBuilder.AppendLine(@"{\fontsize{7pt}{8.5pt}\selectfont"); // kleiner als \small
+    bodyBuilder.AppendLine(@"{\fontsize{8pt}{8.5pt}\selectfont"); // kleiner als \small
     bodyBuilder.AppendLine(@"\rowcolors{3}{rowgray}{white}"); // ab der 1. Datenzeile (nach 2 Headerzeilen) einfärben
-    bodyBuilder.Append(@"\begin{tabular}{r c l l l l");
+    bodyBuilder.Append(@"\begin{tabular}{c r l l l l");
     bodyBuilder.Append(new string('r', apparatus.Length * 3));
     bodyBuilder.AppendLine(" >{\\bfseries}r}");
 
     // 1. Headerzeile
-    bodyBuilder.Append(@"\textbf{Rang} & \textbf{Ausz.} & \textbf{Nachname} & \textbf{Vorname} & \textbf{Verein} & \textbf{JG}");
+    bodyBuilder.Append(@" & \textbf{Rang} & \textbf{Nachname} & \textbf{Vorname} & \textbf{Verein} & \textbf{JG}");
     foreach (var app in apparatus)
     {
         bodyBuilder.Append(" & \\multicolumn{3}{c}{\\textbf{" + EscapeLatex(app) + "}}");
@@ -137,7 +137,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
         var smiley = r.Awarded ? "$\\smiley$" : string.Empty;
 
         bodyBuilder.Append(
-            $"{r.Rank} & {smiley} & {EscapeLatex(r.Nachname)} & {EscapeLatex(r.Vorname)} & {EscapeLatex(r.Verein)} & {EscapeLatex(r.Jg)}");
+            $"{smiley} & {r.Rank} & {EscapeLatex(r.Nachname)} & {EscapeLatex(r.Vorname)} & {EscapeLatex(r.Verein)} & {EscapeLatex(r.Jg)}");
 
         for (int i = 0; i < apparatus.Length; i++)
         {
