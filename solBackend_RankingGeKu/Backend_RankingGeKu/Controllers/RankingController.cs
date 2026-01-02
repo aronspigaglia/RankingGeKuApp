@@ -172,6 +172,8 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 \usepackage{{wasysym}}
 \usepackage{{booktabs}}
 \usepackage[table]{{xcolor}}
+\usepackage{{graphicx}}
+\usepackage{{fancyhdr}}
 \renewcommand{{\arraystretch}}{{1.3}} % mehr Zeilenabstand
 
 \renewcommand\familydefault{{\sfdefault}}
@@ -183,6 +185,16 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 % sehr helles blau für alternate rows
 \definecolor{{rowgray}}{{RGB}}{{215,215,215}} % deutlich dunkler für bessere Lesbarkeit
 
+
+% Header / Footer
+\pagestyle{{fancy}}
+\fancyhf{{}}
+\renewcommand{{\headrulewidth}}{{0pt}}
+\renewcommand{{\footrulewidth}}{{0pt}}
+\rhead{{\includegraphics[height=12mm]{{{{geku-logo.png}}}}}}
+\lfoot{{\small Rangliste}}
+\cfoot{{\small Kutu}}
+\rfoot{{\includegraphics[height=10mm]{{{{alltex-logo.png}}}}}}
 
 \begin{{document}}
 {bodyBuilder}

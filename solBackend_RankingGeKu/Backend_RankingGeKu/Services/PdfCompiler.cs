@@ -88,6 +88,39 @@ public class PdfCompiler
         var texPath = Path.Combine(workdir.FullName, "notesheets.tex");
         await File.WriteAllTextAsync(texPath, latexSource);
 
+        // Assets (Logos) ins Temp-Verzeichnis kopieren, damit tectonic sie findet
+        try
+        {
+            var candidates = new[]
+            {
+                AppContext.BaseDirectory,
+                Directory.GetCurrentDirectory(),
+                Path.GetFullPath(Path.Combine(AppContext.BaseDirectory ?? ".", "..", "..")),          // bin/... -> project root
+                Path.GetFullPath(Path.Combine(AppContext.BaseDirectory ?? ".", "..", "..", "..")),    // bei anderen Buildpfaden
+            };
+
+            var assetsDir = candidates
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Select(p => Path.Combine(p!, "assets"))
+                .FirstOrDefault(Directory.Exists);
+
+            if (assetsDir != null)
+            {
+                foreach (var name in new[] { "geku-logo.png", "alltex-logo.png" })
+                {
+                    var src = Path.Combine(assetsDir, name);
+                    if (File.Exists(src))
+                    {
+                        File.Copy(src, Path.Combine(workdir.FullName, name), overwrite: true);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Falls Logos fehlen oder Copy fehlschlägt: PDF läuft weiter ohne Header/Footer-Bilder
+        }
+
         // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden.
         // Basis: aktuelles WorkingDirectory (wird von Electron auf resources/backend gesetzt)
         var cacheBase = Directory.GetCurrentDirectory();
