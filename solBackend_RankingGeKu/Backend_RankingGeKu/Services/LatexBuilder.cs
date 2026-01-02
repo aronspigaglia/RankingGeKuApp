@@ -13,7 +13,7 @@ public class LatexBuilder
             var (title, data) = sections[i];
 
             body.AppendLine($@"
-{{\LARGE \textbf{{{E(title)}}}}}\par\vspace{{6mm}}
+{{\LARGE \textbf{{{FormatTitle(title)}}}}}\par\vspace{{6mm}}
 
 \begin{{longtable}}{{|p{{3.0cm}}|p{{3.0cm}}|p{{1.0cm}}|p{{5.0cm}}|p{{1.2cm}}|p{{1.5cm}}|p{{1.8cm}}|}}
 \hline
@@ -60,6 +60,25 @@ $@"\documentclass[a4paper,10pt,landscape]{{article}}
             sb.AppendLine($"{E(a.Nachname)} & {E(a.Vorname)} & {E(a.JG)} & {E(a.Verein)} & {E(a.Kat)} & & \\\\ \\hline");
         }
         return sb.ToString();
+    }
+
+    private static string FormatTitle(string title)
+    {
+        var parts = title
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToArray();
+
+        if (parts.Length == 0)
+            return string.Empty;
+
+        var first = E(parts[0]); // Apparatur: groß & fett
+
+        if (parts.Length == 1)
+            return $@"{{\LARGE \textbf{{{first}}}}}";
+
+        // Zweite Zeile leicht kleiner + etwas Abstand
+        var rest = string.Join(@"\\", parts.Skip(1).Select(E));
+        return $@"{{\LARGE \textbf{{{first}}}}}\\[3mm]{{\Large {rest}}}";
     }
 
     private static string E(string? s)

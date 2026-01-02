@@ -49,7 +49,8 @@ public class NotesheetsController : ControllerBase
             for (int d = 1; d <= 6; d++)
             {
                 int appIndex = (d - 1 + g) % 6;  // Rotation je Gruppe
-                string title = $"{apparatus[appIndex]} — Durchgang {d} — Gruppe {g + 1}";
+                // Titel zweizeilig: Apparatur oben, darunter Durchgang/Gruppe (per \n, wird in LaTeX zu \\)
+                string title = $"{apparatus[appIndex]}\nDurchgang {d}, Gruppe {g + 1}";
                 sections.Add((title, groupData));
             }
         }
