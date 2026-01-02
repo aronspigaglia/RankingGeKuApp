@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Athlete } from '../models/athlete';
+import { Athlete, PerDurchgangNotes } from '../models/athlete';
 
 interface PersistedState {
   csv: string | null;
@@ -71,6 +71,119 @@ export class NotesStateService {
     this.saveToStorage();
   }
 
+  /** CSV aus aktuellem Zustand erzeugen (inkl. Noten). */
+  exportNotesCsv(delimiter = ';'): string {
+    const header = [
+      'Gruppe',
+      'Nachname',
+      'Vorname',
+      'JG',
+      'Verein',
+      'Kat',
+      'D1',
+      'END1',
+      'D2',
+      'END2',
+      'D3',
+      'END3',
+      'D4',
+      'END4',
+      'D5',
+      'END5',
+      'D6',
+      'END6'
+    ];
+
+    const lines = [header.join(delimiter)];
+    const groups = this.groupsSubject.value;
+
+    groups.forEach((group, gIndex) => {
+      group.forEach(athlete => {
+        const notes = this.ensureSixNotes(athlete.notes)
+          .flatMap(n => [n.dNote ?? '', n.endNote ?? '']);
+
+        lines.push([
+          gIndex + 1,
+          athlete.nachname,
+          athlete.vorname,
+          athlete.jg,
+          athlete.verein,
+          athlete.kat,
+          ...notes
+        ].map(v => (v ?? '').toString().replace(/\r?\n/g, ' ').trim()).join(delimiter));
+      });
+    });
+
+    return lines.join('\n');
+  }
+
+  /**
+   * CSV laden (inkl. Noten). Erwartet Header mit "Gruppe;Nachname;...;END6".
+   * Notenfelder sind optional.
+   */
+  loadNotesCsvText(csvText: string, delimiter = ';') {
+    const lines = csvText
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => !!l);
+
+    if (!lines.length) return;
+
+    const rows = lines.map(l => l.split(delimiter).map(p => p.trim()));
+    // optional Header entfernen
+    const first = rows[0];
+    if (first?.[0]?.toLowerCase() === 'gruppe') {
+      rows.shift();
+    }
+
+    const groups: Athlete[][] = [];
+
+    for (const parts of rows) {
+      if (parts.length < 6) continue;
+      const [
+        groupStr,
+        nachname = '',
+        vorname = '',
+        jg = '',
+        verein = '',
+        kat = '',
+        ...noteParts
+      ] = parts;
+
+      const groupIndex = Number.parseInt(groupStr, 10);
+      const targetIdx =
+        Number.isFinite(groupIndex) && groupIndex > 0
+          ? groupIndex - 1
+          : groups.length;
+
+      while (groups.length <= targetIdx) {
+        groups.push([]);
+      }
+
+      const notes: PerDurchgangNotes[] = [];
+      for (let i = 0; i < 6; i++) {
+        const dNote = noteParts[i * 2]?.trim() ?? '';
+        const endNote = noteParts[i * 2 + 1]?.trim() ?? '';
+        notes.push({
+          ...(dNote ? { dNote } : {}),
+          ...(endNote ? { endNote } : {})
+        });
+      }
+
+      groups[targetIdx].push({
+        nachname,
+        vorname,
+        jg,
+        verein,
+        kat,
+        notes: this.ensureSixNotes(notes)
+      });
+    }
+
+    this.rawCsv = this.buildRawAthleteCsv(groups, delimiter);
+    this.setGroups(groups);
+  }
+
   /**
    * CSV laden (ohne Header). Gruppen werden durch eine Zeile "-" getrennt.
    * Spalten: Nachname;Vorname;JG;Verein;Kat
@@ -124,5 +237,32 @@ export class NotesStateService {
 
   getCategoriesSnapshot(): string[] {
     return this.categoriesSubject.value;
+  }
+
+  private ensureSixNotes(notes: PerDurchgangNotes[]): PerDurchgangNotes[] {
+    const result = Array.from({ length: 6 }, (_, i) => notes[i] ?? {});
+    return result;
+  }
+
+  private buildRawAthleteCsv(groups: Athlete[][], delimiter = ';'): string {
+    const lines: string[] = [];
+
+    groups.forEach((group, idx) => {
+      if (idx > 0) {
+        lines.push('-');
+      }
+
+      group.forEach(a => {
+        lines.push([
+          a.nachname,
+          a.vorname,
+          a.jg,
+          a.verein,
+          a.kat
+        ].map(v => v ?? '').join(delimiter));
+      });
+    });
+
+    return lines.join('\n');
   }
 }
