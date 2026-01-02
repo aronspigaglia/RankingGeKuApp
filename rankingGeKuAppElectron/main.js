@@ -1,6 +1,14 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
+// On Windows, handle Squirrel events so the installer creates shortcuts (incl. Desktop)
+if (require('electron-squirrel-startup')) {
+  app.quit();
+}
+// Stop auto-launch right after install/first-run on Windows
+if (process.platform === 'win32' && process.argv.includes('--squirrel-firstrun')) {
+  app.quit();
+}
 
 let mainWindow;
 let backendProcess;
@@ -83,7 +91,7 @@ function createWindow() {
   icon: path.join(
     assetsPath,
     'icons',
-    process.platform === 'win32' ? 'icon.png' : 'icon.icns'
+    process.platform === 'win32' ? 'icon.ico' : 'icon.icns'
   ),
   webPreferences: {
     nodeIntegration: false,

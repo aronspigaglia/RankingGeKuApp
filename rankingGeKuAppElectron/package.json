@@ -29,7 +29,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/icons/icon.png"
+      "icon": "assets/icons/icon.ico"
     },
     "files": [
       "main.js",
