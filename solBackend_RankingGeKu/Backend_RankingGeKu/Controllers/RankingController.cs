@@ -100,17 +100,17 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 
     bodyBuilder.AppendLine($@"\section*{{{EscapeLatex(title)}}}");
     bodyBuilder.AppendLine($@"Anzahl Athletinnen/Athleten: {katRows.Count}\\");
-    bodyBuilder.AppendLine($@"Kategorie(n): {EscapeLatex(katList)}\\[5mm]");
+    bodyBuilder.AppendLine($@"Rangliste Kutu {EscapeLatex(katList)}\\[5mm]");
 
     // Tabellenkopf mit 3 Spalten pro Gerät
     // Spalten: Rang, Ausz, Nachname, Vorname, Verein, JG, (E,D,(Rang))*6, Total
 
 
-    bodyBuilder.AppendLine(@"{\small");   // Tabelle leicht kleiner
+    bodyBuilder.AppendLine(@"{\fontsize{7pt}{8.5pt}\selectfont"); // kleiner als \small
+    bodyBuilder.AppendLine(@"\rowcolors{3}{rowgray}{white}"); // ab der 1. Datenzeile (nach 2 Headerzeilen) einfärben
     bodyBuilder.Append(@"\begin{tabular}{r c l l l l");
     bodyBuilder.Append(new string('r', apparatus.Length * 3));
-    bodyBuilder.AppendLine(" r}");
-    bodyBuilder.AppendLine(@"\rowcolors{2}{rowblue}{white}"); // alternierende Farbe
+    bodyBuilder.AppendLine(" >{\\bfseries}r}");
 
     // 1. Headerzeile
     bodyBuilder.Append(@"\textbf{Rang} & \textbf{Ausz.} & \textbf{Nachname} & \textbf{Vorname} & \textbf{Verein} & \textbf{JG}");
@@ -124,7 +124,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
     bodyBuilder.Append(" &  &  &  &  & "); // 6 Basis-Spalten leer
     foreach (var _ in apparatus)
     {
-        bodyBuilder.Append(" & E & {\\scriptsize D} & {\\scriptsize (R)}");
+        bodyBuilder.Append(" & E & {\\fontsize{6pt}{7pt}\\selectfont D} & {\\fontsize{6pt}{7pt}\\selectfont (R)}");
     }
     bodyBuilder.AppendLine(" & \\\\");
     bodyBuilder.AppendLine(@"\hline");
@@ -160,7 +160,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
             bodyBuilder.Append($" & {eStr} & {dStr} & {devRankStr}");
         }
 
-        bodyBuilder.AppendLine(" & " + totalStr + " \\\\");
+        bodyBuilder.AppendLine(" & \\textbf{" + totalStr + "} \\\\");
     }
 
     bodyBuilder.AppendLine(@"\end{tabular}");
@@ -179,12 +179,12 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 
 \renewcommand\familydefault{{\sfdefault}}
 
-% kleinere Noten
-\newcommand{{\smallD}}[1]{{{{\scriptsize #1}}}}
-\newcommand{{\smallR}}[1]{{{{\scriptsize (#1)}}}}
+% kleinere Noten (explizit kleiner als Tabellenfont)
+\newcommand{{\smallD}}[1]{{{{\fontsize{{6pt}}{{7pt}}\selectfont #1}}}}
+\newcommand{{\smallR}}[1]{{{{\fontsize{{6pt}}{{7pt}}\selectfont (#1)}}}}
 
 % sehr helles blau für alternate rows
-\definecolor{{rowblue}}{{RGB}}{{235,245,255}} % fast weiss
+\definecolor{{rowgray}}{{RGB}}{{215,215,215}} % deutlich dunkler für bessere Lesbarkeit
 
 
 \begin{{document}}
