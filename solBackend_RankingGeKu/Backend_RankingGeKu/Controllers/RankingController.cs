@@ -83,9 +83,8 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
     AssignDeviceRanksPerCategory(rows, apparatus.Length);
 
     var kat = distinctKats[0]; // Frontend schickt eine Kat pro Request
-    var title = string.IsNullOrWhiteSpace(request.CompetitionName)
-        ? $"Rangliste {kat}"
-        : request.CompetitionName;
+    var katList = string.Join(", ", distinctKats);
+    var title = "Rangliste Kutu " + katList;
 
     var katRows = rows
         .Where(r => r.Kat == kat)
@@ -94,13 +93,10 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
         .ThenBy(r => r.Vorname)
         .ToList();
 
-    var katList = string.Join(", ", distinctKats);
 
     var bodyBuilder = new StringBuilder();
 
     bodyBuilder.AppendLine($@"\section*{{{EscapeLatex(title)}}}");
-    bodyBuilder.AppendLine($@"Anzahl Athletinnen/Athleten: {katRows.Count}\\");
-    bodyBuilder.AppendLine($@"Rangliste Kutu {EscapeLatex(katList)}\\[5mm]");
 
     // Tabellenkopf mit 3 Spalten pro Gerät
     // Spalten: Rang, Ausz, Nachname, Vorname, Verein, JG, (E,D,(Rang))*6, Total
@@ -108,7 +104,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 
     bodyBuilder.AppendLine(@"{\fontsize{8pt}{8.5pt}\selectfont"); // kleiner als \small
     bodyBuilder.AppendLine(@"\rowcolors{3}{rowgray}{white}"); // ab der 1. Datenzeile (nach 2 Headerzeilen) einfärben
-    bodyBuilder.Append(@"\begin{tabular}{c r l l l l");
+    bodyBuilder.Append(@"\begin{tabular}{c l l l l l");
     bodyBuilder.Append(new string('r', apparatus.Length * 3));
     bodyBuilder.AppendLine(" >{\\bfseries}r}");
 
@@ -116,7 +112,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
     bodyBuilder.Append(@" & \textbf{Rang} & \textbf{Nachname} & \textbf{Vorname} & \textbf{Verein} & \textbf{JG}");
     foreach (var app in apparatus)
     {
-        bodyBuilder.Append(" & \\multicolumn{3}{c}{\\textbf{" + EscapeLatex(app) + "}}");
+        bodyBuilder.Append(" & \\multicolumn{3}{l}{\\textbf{" + EscapeLatex(app) + "}}");
     }
     bodyBuilder.AppendLine(" & \\textbf{Total} \\\\");
 
@@ -176,6 +172,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 \usepackage{{wasysym}}
 \usepackage{{booktabs}}
 \usepackage[table]{{xcolor}}
+\renewcommand{{\arraystretch}}{{1.3}} % mehr Zeilenabstand
 
 \renewcommand\familydefault{{\sfdefault}}
 
