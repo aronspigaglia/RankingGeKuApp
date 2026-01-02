@@ -58,6 +58,6 @@ public class NotesheetsController : ControllerBase
         var tex = _latexBuilder.BuildMany(sections);
         var pdfBytes = await _pdfCompiler.CompileAsync(tex, ct);
 
-        return File(pdfBytes, "application/pdf", $"Notenblaetter_{groups.Count}Gruppen_x6_merged.pdf");
+        return File(pdfBytes, "application/pdf", $"Notenblaetter");
     }
 }
