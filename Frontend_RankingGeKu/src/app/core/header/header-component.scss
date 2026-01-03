@@ -3,6 +3,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  cursor: default; /* avoid pointer over the whole header */
 }
 
 .navbar-brand .brand-logo {
@@ -21,4 +22,37 @@
 
 .navbar-color {
   background-color: white; 
+}
+
+.egg-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.egg-modal {
+  position: relative;
+  background: #fff;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  max-width: 360px;
+  width: min(90vw, 360px);
+}
+
+.egg-image {
+  max-width: 220px;
+  width: 200%;
+  height: auto;
+}
+
+.egg-modal .btn-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
 }
