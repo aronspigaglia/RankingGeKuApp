@@ -24,6 +24,14 @@
   background-color: white; 
 }
 
+.egg-trigger {
+  opacity: 0; /* hide but keep layout and click */
+  color: transparent;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
 .egg-backdrop {
   position: fixed;
   inset: 0;
