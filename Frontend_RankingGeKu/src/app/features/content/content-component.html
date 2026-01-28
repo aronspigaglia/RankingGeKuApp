@@ -1,10 +1,7 @@
 <div class="app-content px-3 py-3">
   @if (!imported) {
-    <div class="alert alert-info">
-      Zuerst Athleten-CSV importieren.
-    </div>
+    <div class="alert alert-info">Zuerst Athleten-CSV importieren.</div>
   } @else {
-
     <!-- Tabs D1..D6 -->
     <ul class="nav nav-tabs mb-4">
       @for (tab of tabs; let i = $index; track i) {
@@ -20,9 +17,7 @@
     <div class="sheet-grid">
       @for (group of groups; let g = $index; track g) {
         <div class="sheet-box">
-          <h5 class="fw-semibold mb-3">
-            Gruppe {{ g + 1 }} – {{ getApparatusName(g) }}
-          </h5>
+          <h5 class="fw-semibold mb-3">Gruppe {{ g + 1 }} – {{ getApparatusName(g) }}</h5>
           <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
               <thead class="table-light">
@@ -43,22 +38,24 @@
                     <td>{{ a.verein }}</td>
                     <td>{{ a.kat }}</td>
                     <td class="text-end">
-                        <input
-                            type="text"
-                            inputmode="decimal"
-                            class="form-control form-control-sm no-spinners text-end"
-                            [(ngModel)]="a.notes[activeTabIndex].dNote"
-                            (ngModelChange)="state.saveSnapshot()"
-                            placeholder="–" />
+                      <input
+                        type="text"
+                        inputmode="decimal"
+                        class="form-control form-control-sm no-spinners text-end"
+                        [(ngModel)]="a.notes[activeTabIndex].dNote"
+                        (ngModelChange)="state.saveSnapshot()"
+                        placeholder="–"
+                      />
                     </td>
                     <td class="text-end">
-                        <input
-                            type="text"
-                            inputmode="decimal"
-                            class="form-control form-control-sm no-spinners text-end"
-                            [(ngModel)]="a.notes[activeTabIndex].endNote"
-                            (ngModelChange)="state.saveSnapshot()"
-                            placeholder="–" />
+                      <input
+                        type="text"
+                        inputmode="decimal"
+                        class="form-control form-control-sm no-spinners text-end"
+                        [(ngModel)]="a.notes[activeTabIndex].endNote"
+                        (ngModelChange)="state.saveSnapshot()"
+                        placeholder="–"
+                      />
                     </td>
                   </tr>
                 }

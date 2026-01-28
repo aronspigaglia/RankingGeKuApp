@@ -18,7 +18,9 @@ export class NotesStateService {
   imported$ = this.importedSubject.asObservable();
 
   private rawCsv: string | null = null;
-  getRawCsv(): string | null { return this.rawCsv; }
+  getRawCsv(): string | null {
+    return this.rawCsv;
+  }
 
   /** Beim App-Start aufrufen: lädt vorhandenen Zustand aus localStorage. */
   loadFromStorage() {
@@ -31,9 +33,8 @@ export class NotesStateService {
       this.importedSubject.next(!!parsed.groups?.length);
 
       if (parsed.groups) {
-        this.setGroups(parsed.groups); 
+        this.setGroups(parsed.groups);
       }
-
     } catch {
       // falls etwas korrupt ist: ignorieren
     }
@@ -43,7 +44,7 @@ export class NotesStateService {
   private saveToStorage() {
     const snapshot: PersistedState = {
       csv: this.rawCsv,
-      groups: this.groupsSubject.value
+      groups: this.groupsSubject.value,
     };
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(snapshot));
   }
@@ -61,13 +62,13 @@ export class NotesStateService {
     this.groupsSubject.next(groups);
     this.importedSubject.next(groups.length > 0);
     const cats = groups
-      .flatMap(g => g)
-      .map(a => a.kat?.trim())
+      .flatMap((g) => g)
+      .map((a) => a.kat?.trim())
       .filter((k): k is string => !!k)
-      .filter((v, i, arr) => arr.indexOf(v) === i) 
+      .filter((v, i, arr) => arr.indexOf(v) === i)
       .sort((a, b) => a.localeCompare(b));
 
-  this.categoriesSubject.next(cats);
+    this.categoriesSubject.next(cats);
     this.saveToStorage();
   }
 
@@ -91,26 +92,32 @@ export class NotesStateService {
       'D5',
       'END5',
       'D6',
-      'END6'
+      'END6',
     ];
 
     const lines = [header.join(delimiter)];
     const groups = this.groupsSubject.value;
 
     groups.forEach((group, gIndex) => {
-      group.forEach(athlete => {
-        const notes = this.ensureSixNotes(athlete.notes)
-          .flatMap(n => [n.dNote ?? '', n.endNote ?? '']);
+      group.forEach((athlete) => {
+        const notes = this.ensureSixNotes(athlete.notes).flatMap((n) => [
+          n.dNote ?? '',
+          n.endNote ?? '',
+        ]);
 
-        lines.push([
-          gIndex + 1,
-          athlete.nachname,
-          athlete.vorname,
-          athlete.jg,
-          athlete.verein,
-          athlete.kat,
-          ...notes
-        ].map(v => (v ?? '').toString().replace(/\r?\n/g, ' ').trim()).join(delimiter));
+        lines.push(
+          [
+            gIndex + 1,
+            athlete.nachname,
+            athlete.vorname,
+            athlete.jg,
+            athlete.verein,
+            athlete.kat,
+            ...notes,
+          ]
+            .map((v) => (v ?? '').toString().replace(/\r?\n/g, ' ').trim())
+            .join(delimiter),
+        );
       });
     });
 
@@ -124,12 +131,12 @@ export class NotesStateService {
   loadNotesCsvText(csvText: string, delimiter = ';') {
     const lines = csvText
       .split(/\r?\n/)
-      .map(l => l.trim())
-      .filter(l => !!l);
+      .map((l) => l.trim())
+      .filter((l) => !!l);
 
     if (!lines.length) return;
 
-    const rows = lines.map(l => l.split(delimiter).map(p => p.trim()));
+    const rows = lines.map((l) => l.split(delimiter).map((p) => p.trim()));
     // optional Header entfernen
     const first = rows[0];
     if (first?.[0]?.toLowerCase() === 'gruppe') {
@@ -140,21 +147,12 @@ export class NotesStateService {
 
     for (const parts of rows) {
       if (parts.length < 6) continue;
-      const [
-        groupStr,
-        nachname = '',
-        vorname = '',
-        jg = '',
-        verein = '',
-        kat = '',
-        ...noteParts
-      ] = parts;
+      const [groupStr, nachname = '', vorname = '', jg = '', verein = '', kat = '', ...noteParts] =
+        parts;
 
       const groupIndex = Number.parseInt(groupStr, 10);
       const targetIdx =
-        Number.isFinite(groupIndex) && groupIndex > 0
-          ? groupIndex - 1
-          : groups.length;
+        Number.isFinite(groupIndex) && groupIndex > 0 ? groupIndex - 1 : groups.length;
 
       while (groups.length <= targetIdx) {
         groups.push([]);
@@ -166,7 +164,7 @@ export class NotesStateService {
         const endNote = noteParts[i * 2 + 1]?.trim() ?? '';
         notes.push({
           ...(dNote ? { dNote } : {}),
-          ...(endNote ? { endNote } : {})
+          ...(endNote ? { endNote } : {}),
         });
       }
 
@@ -176,7 +174,7 @@ export class NotesStateService {
         jg,
         verein,
         kat,
-        notes: this.ensureSixNotes(notes)
+        notes: this.ensureSixNotes(notes),
       });
     }
 
@@ -191,9 +189,7 @@ export class NotesStateService {
   loadCsvText(csvText: string, delimiter = ';') {
     this.rawCsv = csvText;
 
-    const lines = csvText
-      .split(/\r?\n/)
-      .map(l => l.trim());
+    const lines = csvText.split(/\r?\n/).map((l) => l.trim());
 
     const groups: Athlete[][] = [];
     let current: Athlete[] = [];
@@ -207,20 +203,25 @@ export class NotesStateService {
         continue;
       }
 
-      const [nachname = '', vorname = '', jg = '', verein = '', kat = ''] =
-        line.split(delimiter).map(p => p?.trim() ?? '');
+      const [nachname = '', vorname = '', jg = '', verein = '', kat = ''] = line
+        .split(delimiter)
+        .map((p) => p?.trim() ?? '');
 
       if (!nachname && !vorname && !jg && !verein && !kat) continue;
 
       current.push({
-        nachname, vorname, jg, verein, kat,
+        nachname,
+        vorname,
+        jg,
+        verein,
+        kat,
         notes: Array.from({ length: 6 }, () => ({})), // D1..D6
       });
     }
     if (current.length) groups.push(current);
 
-    this.setGroups(groups);     // setzt + speichert
-    this.saveToStorage();       // speichert auch CSV
+    this.setGroups(groups); // setzt + speichert
+    this.saveToStorage(); // speichert auch CSV
   }
 
   /** Bei Änderungen an Noten aufrufen (z. B. nach ngModelChange). */
@@ -229,7 +230,7 @@ export class NotesStateService {
   }
 
   getGroupsSnapshot() {
-  return this.groupsSubject.value;
+    return this.groupsSubject.value;
   }
 
   private categoriesSubject = new BehaviorSubject<string[]>([]);
@@ -252,14 +253,10 @@ export class NotesStateService {
         lines.push('-');
       }
 
-      group.forEach(a => {
-        lines.push([
-          a.nachname,
-          a.vorname,
-          a.jg,
-          a.verein,
-          a.kat
-        ].map(v => v ?? '').join(delimiter));
+      group.forEach((a) => {
+        lines.push(
+          [a.nachname, a.vorname, a.jg, a.verein, a.kat].map((v) => v ?? '').join(delimiter),
+        );
       });
     });
 
