@@ -14,8 +14,23 @@
   </div>
 </nav>
 @if (showEasterEgg) {
-  <div class="egg-backdrop" (click)="closeEasterEgg()">
-    <div class="egg-modal" (click)="$event.stopPropagation()">
+  <div
+    class="egg-backdrop"
+    role="button"
+    tabindex="0"
+    (click)="closeEasterEgg()"
+    (keydown.enter)="closeEasterEgg()"
+    (keydown.space)="closeEasterEgg()"
+  >
+    <div
+      class="egg-modal"
+      role="dialog"
+      aria-modal="true"
+      tabindex="0"
+      (click)="$event.stopPropagation()"
+      (keydown.enter)="$event.stopPropagation()"
+      (keydown.space)="$event.stopPropagation()"
+    >
       <button
         type="button"
         class="btn-close"

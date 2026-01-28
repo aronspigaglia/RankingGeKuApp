@@ -43,20 +43,21 @@
     </button>
   </div>
   <!-- 3.1 Kategorie-Auswahl für Rangliste -->
-  <div class="mb-3">
-    <label class="form-label small mb-1">Kategorie für Rangliste</label>
-    <select
-      class="form-select form-select-sm"
-      [(ngModel)]="selectedCategory"
-      [disabled]="
-        !imported ||
-        categories.length === 0 ||
-        busyNotesheets ||
-        busyRanking ||
-        busyExport ||
-        busyImport
-      "
-    >
+    <div class="mb-3">
+      <label for="rank-category" class="form-label small mb-1">Kategorie für Rangliste</label>
+      <select
+        id="rank-category"
+        class="form-select form-select-sm"
+        [(ngModel)]="selectedCategory"
+        [disabled]="
+          !imported ||
+          categories.length === 0 ||
+          busyNotesheets ||
+          busyRanking ||
+          busyExport ||
+          busyImport
+        "
+      >
       <option [ngValue]="null" disabled>– Kategorie wählen –</option>
       @for (cat of categories; track cat) {
         <option [ngValue]="cat">{{ cat }}</option>
