@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "Frontend_RankingGeKu"
+		},
+		{
+			"path": "solBackend_RankingGeKu"
+		},
+		{
+			"path": "rankingGeKuAppElectron"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true
+	}
+}
