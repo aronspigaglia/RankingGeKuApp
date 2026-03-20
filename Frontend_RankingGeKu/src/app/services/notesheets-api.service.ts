@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { RankingRequestDto } from '../models/ranking-request';
 
 @Injectable({ providedIn: 'root' })
@@ -7,7 +7,7 @@ export class NotesheetsApiService {
   // adjust if you use environments
   private baseUrl = 'http://127.0.0.1:5157';
 
-  private readonly http = inject(HttpClient);
+  constructor(private http: HttpClient) {}
 
   /** Sends CSV as file to /api/notesheets/merged and returns the PDF (Blob). */
   uploadCsvAndGetMergedPdf(csvText: string, delimiter = ';') {

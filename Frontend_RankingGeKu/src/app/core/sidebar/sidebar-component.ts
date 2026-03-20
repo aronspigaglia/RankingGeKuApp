@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NotesStateService } from '../../services/notes-state.service';
 import { NotesheetsApiService } from '../../services/notesheets-api.service';
 import { RankingAthleteDto, RankingRequestDto } from '../../models/ranking-request';
@@ -24,13 +24,13 @@ export class SidebarComponent {
 
   readonly apparatus = ['Boden', 'Pferd', 'Ring', 'Sprung', 'Barren', 'Reck'];
 
-  private readonly state = inject(NotesStateService);
-  private readonly api = inject(NotesheetsApiService);
-
   categories: string[] = [];
   selectedCategory: string | null = null;
 
-  constructor() {
+  constructor(
+    private state: NotesStateService,
+    private api: NotesheetsApiService,
+  ) {
     this.state.imported$.subscribe((v) => (this.imported = v));
     this.state.categories$.subscribe((cats) => {
       this.categories = cats;
@@ -93,14 +93,16 @@ export class SidebarComponent {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch (err: unknown) {
-      this.errorMsg = this.getErrorMessage(err, 'Fehler beim Erzeugen der Notenblätter.');
+    } catch (err: any) {
+      this.errorMsg = err?.message ?? 'Fehler beim Erzeugen der Notenblätter.';
     } finally {
       this.busyNotesheets = false;
     }
   }
   private buildRankingPayload(): RankingRequestDto {
     const groups = this.state.getGroupsSnapshot();
+    const selected = this.selectedCategory;
+
     const athletes: RankingAthleteDto[] = [];
     groups.forEach((group, gIndex) => {
       group.forEach((a) => {
@@ -128,6 +130,7 @@ export class SidebarComponent {
   }
   private getWholeRankingPayload(): RankingRequestDto {
     const groups = this.state.getGroupsSnapshot();
+    const selected = this.selectedCategory;
 
     const athletes: RankingAthleteDto[] = [];
     groups.forEach((group, gIndex) => {
@@ -173,11 +176,11 @@ export class SidebarComponent {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch (err: unknown) {
-      this.errorMsg = this.getErrorMessage(
-        err,
-        'Fehler beim Erzeugen der Rangliste (Backend noch nicht fertig?).',
-      );
+    } catch (err: any) {
+      this.errorMsg =
+        err?.error?.title ||
+        err?.message ||
+        'Fehler beim Erzeugen der Rangliste (Backend noch nicht fertig?).';
     } finally {
       this.busyRanking = false;
     }
@@ -262,30 +265,10 @@ export class SidebarComponent {
       const csv = lines.join('\n');
       this.state.loadNotesCsvText(csv, delimiter);
       this.errorMsg = '';
-    } catch (err: unknown) {
-      this.errorMsg = this.getErrorMessage(err, 'Import fehlgeschlagen. Bitte gültige JSON-Datei wählen.');
+    } catch (err: any) {
+      this.errorMsg = err?.message || 'Import fehlgeschlagen. Bitte gültige JSON-Datei wählen.';
     } finally {
       input.value = '';
     }
-  }
-
-  private getErrorMessage(err: unknown, fallback: string): string {
-    if (err instanceof Error && typeof err.message === 'string') {
-      return err.message;
-    }
-
-    if (typeof err === 'object' && err !== null) {
-      const maybe = err as { error?: { title?: unknown }; message?: unknown };
-
-      if (typeof maybe.error?.title === 'string') {
-        return maybe.error.title;
-      }
-
-      if (typeof maybe.message === 'string') {
-        return maybe.message;
-      }
-    }
-
-    return fallback;
   }
 }

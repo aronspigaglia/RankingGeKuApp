@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { NotesStateService } from '../../services/notes-state.service';
 import { Athlete } from '../../models/athlete';
 import { FormsModule } from '@angular/forms';
@@ -17,9 +17,7 @@ export class ContentComponent {
   groups: Athlete[][] = [];
   readonly apparatus = ['Boden', 'Pferd', 'Ring', 'Sprung', 'Barren', 'Reck']; // <— NEU
 
-  public state = inject(NotesStateService);
-
-  constructor() {
+  constructor(public state: NotesStateService) {
     this.state.imported$.subscribe((v) => (this.imported = v));
     this.state.groups$.subscribe((g) => (this.groups = g));
   }
@@ -37,5 +35,5 @@ export class ContentComponent {
   }
 
   // convenience for template
-  trackByIndex = (index: number) => index;
+  trackByIndex = (_: number, __: any) => _;
 }
