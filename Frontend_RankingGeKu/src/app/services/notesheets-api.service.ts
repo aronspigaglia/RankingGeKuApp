@@ -19,14 +19,14 @@ export class NotesheetsApiService {
     return this.http.post(
       `${this.baseUrl}/api/notesheets/merged?delimiter=${encodeURIComponent(delimiter)}`,
       form,
-      { responseType: 'blob', observe: 'response' as const },
+      { responseType: 'blob', observe: 'response' as const }
     );
   }
   generateRankingPdf(payload: RankingRequestDto) {
     return this.http.post(
-      `${this.baseUrl}/api/ranking`, // Endpoint implementieren wir später im Backend
+      `${this.baseUrl}/api/ranking`,   // Endpoint implementieren wir später im Backend
       payload,
-      { responseType: 'blob', observe: 'response' as const },
+      { responseType: 'blob', observe: 'response' as const }
     );
   }
 }

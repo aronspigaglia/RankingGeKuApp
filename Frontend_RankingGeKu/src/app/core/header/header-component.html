@@ -7,21 +7,14 @@
         class="btn btn-outline-secondary btn-sm ms-auto egg-trigger"
         aria-label="Easter Egg"
         (click)="easterEgg()"
-      >
-        easterEgg
-      </button>
+      >easterEgg</button>
     </a>
   </div>
 </nav>
-@if (showEasterEgg) {
+@if (showEasterEgg){
   <div class="egg-backdrop" (click)="closeEasterEgg()">
     <div class="egg-modal" (click)="$event.stopPropagation()">
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        (click)="closeEasterEgg()"
-      ></button>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeEasterEgg()"></button>
       <img src="assets/made-you-look.jpg" alt="Easter egg" class="egg-image" />
       <h5 class="mt-3 mb-2">Easter Egg gefunden!</h5>
     </div>

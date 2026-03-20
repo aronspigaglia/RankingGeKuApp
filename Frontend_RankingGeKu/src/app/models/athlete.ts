@@ -1,5 +1,5 @@
 export interface PerDurchgangNotes {
-  dNote?: string; // e.g. "9.35"
+  dNote?: string;   // e.g. "9.35"
   endNote?: string; // e.g. "9.10"
 }
 

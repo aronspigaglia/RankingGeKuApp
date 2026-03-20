@@ -5,6 +5,8 @@ import { RankingAthleteDto, RankingRequestDto } from '../../models/ranking-reque
 import { firstValueFrom } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
+
+
 @Component({
   imports: [FormsModule],
   selector: 'app-sidebar-component',
@@ -31,8 +33,8 @@ export class SidebarComponent {
     private state: NotesStateService,
     private api: NotesheetsApiService,
   ) {
-    this.state.imported$.subscribe((v) => (this.imported = v));
-    this.state.categories$.subscribe((cats) => {
+    this.state.imported$.subscribe(v => (this.imported = v));
+    this.state.categories$.subscribe(cats => {
       this.categories = cats;
       if (cats.length > 0 && !this.selectedCategory) {
         this.selectedCategory = cats[0]; // erste Kat als Default
@@ -61,16 +63,16 @@ export class SidebarComponent {
     this.selectedCategory = null;
   }
   onClearClick() {
-    const confirmed = window.confirm(
-      'Bist du sicher, dass alle Daten (CSV, Noten, Ranglisten) gelöscht werden sollen?',
-    );
+  const confirmed = window.confirm(
+    'Bist du sicher, dass alle Daten (CSV, Noten, Ranglisten) gelöscht werden sollen?'
+  );
 
-    if (!confirmed) {
-      return;
-    }
-
-    this.clearAll();
+  if (!confirmed) {
+    return;
   }
+
+  this.clearAll();
+}
 
   async generateNotesheets() {
     this.errorMsg = '';
@@ -79,7 +81,9 @@ export class SidebarComponent {
 
     this.busyNotesheets = true;
     try {
-      const res = await firstValueFrom(this.api.uploadCsvAndGetMergedPdf(csv, ';'));
+      const res = await firstValueFrom(
+        this.api.uploadCsvAndGetMergedPdf(csv, ';')
+      );
       const blob = res.body!;
       const cd = res.headers.get('Content-Disposition') || '';
       const match = /filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i.exec(cd);
@@ -105,7 +109,7 @@ export class SidebarComponent {
 
     const athletes: RankingAthleteDto[] = [];
     groups.forEach((group, gIndex) => {
-      group.forEach((a) => {
+      group.forEach(a => {
         if (selected && a.kat !== selected) {
           return; // andere Kategorie ignorieren
         }
@@ -134,7 +138,7 @@ export class SidebarComponent {
 
     const athletes: RankingAthleteDto[] = [];
     groups.forEach((group, gIndex) => {
-      group.forEach((a) => {
+      group.forEach(a => {
         athletes.push({
           nachname: a.nachname,
           vorname: a.vorname,
@@ -159,7 +163,7 @@ export class SidebarComponent {
     if (!this.imported) return;
 
     const payload = this.buildRankingPayload();
-
+    
     this.busyRanking = true;
     try {
       const res = await firstValueFrom(this.api.generateRankingPdf(payload));
@@ -167,7 +171,7 @@ export class SidebarComponent {
       const cd = res.headers.get('Content-Disposition') || '';
       const match = /filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i.exec(cd);
       const filename = match?.[1] ?? 'Rangliste.pdf';
-
+      
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -178,9 +182,9 @@ export class SidebarComponent {
       URL.revokeObjectURL(url);
     } catch (err: any) {
       this.errorMsg =
-        err?.error?.title ||
-        err?.message ||
-        'Fehler beim Erzeugen der Rangliste (Backend noch nicht fertig?).';
+      err?.error?.title ||
+      err?.message ||
+      'Fehler beim Erzeugen der Rangliste (Backend noch nicht fertig?).';
     } finally {
       this.busyRanking = false;
     }
@@ -194,7 +198,8 @@ export class SidebarComponent {
       const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const fileBase =
-        payload.competitionName?.trim().replace(/[^a-z0-9_-]+/gi, '_') || 'noten_export';
+        payload.competitionName?.trim().replace(/[^a-z0-9_-]+/gi, '_') ||
+        'noten_export';
       const a = document.createElement('a');
       a.href = url;
       a.download = `${fileBase}.json`;
@@ -251,14 +256,22 @@ export class SidebarComponent {
       ];
 
       const lines = [header.join(delimiter)];
-      payload.athletes.forEach((a) => {
+      payload.athletes.forEach(a => {
         const notes = Array.from({ length: 6 }, (_, i) => a.notes?.[i] ?? {});
-        const noteParts = notes.flatMap((n) => [n.dNote ?? '', n.endNote ?? '']);
+        const noteParts = notes.flatMap(n => [n.dNote ?? '', n.endNote ?? '']);
 
         lines.push(
-          [a.groupIndex, a.nachname, a.vorname, a.jg, a.verein, a.kat, ...noteParts]
-            .map((v) => (v ?? '').toString().replace(/\r?\n/g, ' ').trim())
-            .join(delimiter),
+          [
+            a.groupIndex,
+            a.nachname,
+            a.vorname,
+            a.jg,
+            a.verein,
+            a.kat,
+            ...noteParts,
+          ]
+            .map(v => (v ?? '').toString().replace(/\r?\n/g, ' ').trim())
+            .join(delimiter)
         );
       });
 
@@ -266,7 +279,8 @@ export class SidebarComponent {
       this.state.loadNotesCsvText(csv, delimiter);
       this.errorMsg = '';
     } catch (err: any) {
-      this.errorMsg = err?.message || 'Import fehlgeschlagen. Bitte gültige JSON-Datei wählen.';
+      this.errorMsg =
+        err?.message || 'Import fehlgeschlagen. Bitte gültige JSON-Datei wählen.';
     } finally {
       input.value = '';
     }
