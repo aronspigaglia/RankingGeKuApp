@@ -83,6 +83,8 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
     AssignDeviceRanksPerCategory(rows, apparatus.Length);
 
     var kat = distinctKats[0]; // Frontend schickt eine Kat pro Request
+    var visibleDeviceIndices = GetVisibleDeviceIndicesForCategory(kat, apparatus);
+    var visibleApparatus = visibleDeviceIndices.Select(i => apparatus[i]).ToList();
     var katList = string.Join(", ", distinctKats);
     var title = "Rangliste Kutu " + katList;
 
@@ -105,12 +107,12 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
     bodyBuilder.AppendLine(@"{\fontsize{8pt}{8.5pt}\selectfont"); // kleiner als \small
     bodyBuilder.AppendLine(@"\rowcolors{3}{rowgray}{white}"); // ab der 1. Datenzeile (nach 2 Headerzeilen) einfärben
     bodyBuilder.Append(@"\begin{tabular}{c l l l l l");
-    bodyBuilder.Append(new string('r', apparatus.Length * 3));
+    bodyBuilder.Append(new string('r', visibleDeviceIndices.Count * 3));
     bodyBuilder.AppendLine(" >{\\bfseries}r}");
 
     // 1. Headerzeile
     bodyBuilder.Append(@" & \textbf{Rang} & \textbf{Nachname} & \textbf{Vorname} & \textbf{Verein} & \textbf{JG}");
-    foreach (var app in apparatus)
+    foreach (var app in visibleApparatus)
     {
         bodyBuilder.Append(" & \\multicolumn{3}{l}{\\textbf{" + EscapeLatex(app) + "}}");
     }
@@ -118,7 +120,7 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 
     // 2. Headerzeile: E / D / (Rang) unter jedem Gerät
     bodyBuilder.Append(" &  &  &  &  & "); // 6 Basis-Spalten leer
-    foreach (var _ in apparatus)
+    foreach (var _ in visibleApparatus)
     {
         bodyBuilder.Append(" & E & {\\fontsize{6pt}{7pt}\\selectfont D} & {\\fontsize{6pt}{7pt}\\selectfont (R)}");
     }
@@ -135,11 +137,11 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
         bodyBuilder.Append(
             $"{smiley} & {r.Rank} & {EscapeLatex(r.Nachname)} & {EscapeLatex(r.Vorname)} & {EscapeLatex(r.Verein)} & {EscapeLatex(r.Jg)}");
 
-        for (int i = 0; i < apparatus.Length; i++)
+        foreach (var deviceIdx in visibleDeviceIndices)
         {
-            decimal e = (r.DeviceEndScores != null && i < r.DeviceEndScores.Length) ? r.DeviceEndScores[i] : 0m;
-            decimal d = (r.DeviceDNotes != null && i < r.DeviceDNotes.Length) ? r.DeviceDNotes[i] : 0m;
-            int devRank = (r.DeviceRanks != null && i < r.DeviceRanks.Length) ? r.DeviceRanks[i] : 0;
+            decimal e = (r.DeviceEndScores != null && deviceIdx < r.DeviceEndScores.Length) ? r.DeviceEndScores[deviceIdx] : 0m;
+            decimal d = (r.DeviceDNotes != null && deviceIdx < r.DeviceDNotes.Length) ? r.DeviceDNotes[deviceIdx] : 0m;
+            int devRank = (r.DeviceRanks != null && deviceIdx < r.DeviceRanks.Length) ? r.DeviceRanks[deviceIdx] : 0;
 
             string eStr = e == 0m 
                 ? string.Empty 
@@ -222,6 +224,38 @@ public async Task<IActionResult> Post([FromBody] RankingRequestDto request, Canc
 }
 
 
+
+    private static List<int> GetVisibleDeviceIndicesForCategory(string category, IReadOnlyList<string> apparatus)
+    {
+        var indices = Enumerable.Range(0, apparatus.Count).ToList();
+
+        if (!string.IsNullOrWhiteSpace(category) &&
+            string.Equals(category.Trim(), "EPA", StringComparison.OrdinalIgnoreCase))
+        {
+            var toHide = apparatus
+                .Select((name, idx) => (name, idx))
+                .Where(x => string.Equals(x.name, "Pferd", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(x.name, "Ring", StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.idx)
+                .ToHashSet();
+
+            // Fallback auf die Default-Positionen, falls die Namen nicht gefunden werden
+            if (toHide.Count == 0)
+            {
+                toHide.UnionWith(new[] { 1, 2 }.Where(i => i < apparatus.Count));
+            }
+
+            indices = indices.Where(i => !toHide.Contains(i)).ToList();
+        }
+
+        // Sicherheitsnetz: falls alles weggefiltert wird, lieber alle anzeigen
+        if (indices.Count == 0)
+        {
+            indices.AddRange(Enumerable.Range(0, apparatus.Count));
+        }
+
+        return indices;
+    }
 
     private static string EscapeLatex(string? s)
     {

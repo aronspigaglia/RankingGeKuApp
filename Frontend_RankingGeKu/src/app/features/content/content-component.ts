@@ -37,6 +37,18 @@ export class ContentComponent {
     return this.apparatus[idx];
   }
 
+  isGroupHidden(group: Athlete[], groupIndex: number): boolean {
+    const app = this.getApparatusName(groupIndex);
+    if (!(app === 'Pferd' || app === 'Ring')) return false;
+    return group.every(a => a.kat?.trim().toUpperCase() === 'EPA');
+  }
+
+  isApparatusDisabledFor(cat: string | null | undefined, groupIndex: number): boolean {
+    if (!cat) return false;
+    const app = this.getApparatusName(groupIndex);
+    return cat.trim().toUpperCase() === 'EPA' && (app === 'Pferd' || app === 'Ring');
+  }
+
   // convenience for template
   trackByIndex = (_: number, __: any) => _;
 
