@@ -1,0 +1,1033 @@
+{
+  "competitionName": "GeKu Rangliste",
+  "apparatus": [
+    "Boden",
+    "Pferd",
+    "Ring",
+    "Sprung",
+    "Barren",
+    "Reck"
+  ],
+  "athletes": [
+    {
+      "nachname": "Hänni",
+      "vorname": "Marino",
+      "jg": "2016",
+      "verein": "Ballwil TV STV",
+      "kat": "P1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11.8"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.7"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.5"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.2"
+        }
+      ]
+    },
+    {
+      "nachname": "Schaller",
+      "vorname": "Jamy",
+      "jg": "2017",
+      "verein": "Rickenbach TV STV",
+      "kat": "P1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "10.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.6"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.95"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "12"
+        }
+      ]
+    },
+    {
+      "nachname": "Bart",
+      "vorname": "Flurin",
+      "jg": "2016",
+      "verein": "Roggliswil TV STV",
+      "kat": "P1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "2",
+          "endNote": "9.1"
+        },
+        {
+          "dNote": "3",
+          "endNote": "7.2"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.3"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.3"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.3"
+        }
+      ]
+    },
+    {
+      "nachname": "Mehr",
+      "vorname": "Dario",
+      "jg": "2017",
+      "verein": "Roggliswil TV STV",
+      "kat": "P1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "8.2"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.2"
+        },
+        {
+          "dNote": "3.15",
+          "endNote": "11.1"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.2"
+        }
+      ]
+    },
+    {
+      "nachname": "Peter",
+      "vorname": "Fabian",
+      "jg": "2015",
+      "verein": "Roggliswil TV STV",
+      "kat": "P1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.35"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.2"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.3"
+        }
+      ]
+    },
+    {
+      "nachname": "Schumacher",
+      "vorname": "Jaron",
+      "jg": "2016",
+      "verein": "Roggliswil TV STV",
+      "kat": "P1",
+      "groupIndex": 1,
+      "notes": [
+        {
+          "dNote": "4",
+          "endNote": "12.8"
+        },
+        {
+          "dNote": "5.9",
+          "endNote": "15.5"
+        },
+        {
+          "dNote": "4",
+          "endNote": "13"
+        },
+        {
+          "dNote": "4",
+          "endNote": "13.1"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.7"
+        },
+        {
+          "dNote": "4",
+          "endNote": "13.4"
+        }
+      ]
+    },
+    {
+      "nachname": "Bühlmann",
+      "vorname": "Luca",
+      "jg": "2016",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P1",
+      "groupIndex": 2,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "6.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.2"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.5"
+        }
+      ]
+    },
+    {
+      "nachname": "Marti",
+      "vorname": "Armando",
+      "jg": "2016",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P1",
+      "groupIndex": 2,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11.1"
+        },
+        {
+          "dNote": "2.5",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3.15",
+          "endNote": "11.65"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.2"
+        },
+        {
+          "dNote": "2",
+          "endNote": "10"
+        }
+      ]
+    },
+    {
+      "nachname": "Purtschert",
+      "vorname": "Juri",
+      "jg": "2015",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P1",
+      "groupIndex": 2,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.2"
+        }
+      ]
+    },
+    {
+      "nachname": "Schmid",
+      "vorname": "Till",
+      "jg": "2016",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P1",
+      "groupIndex": 2,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.4"
+        },
+        {
+          "dNote": "3.15",
+          "endNote": "11.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.6"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "8.8"
+        }
+      ]
+    },
+    {
+      "nachname": "Waldispühl",
+      "vorname": "Gian",
+      "jg": "2017",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P1",
+      "groupIndex": 2,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.15"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        }
+      ]
+    },
+    {
+      "nachname": "Eberli",
+      "vorname": "Florian",
+      "jg": "2013",
+      "verein": "Luzern BTV STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.95"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.4"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.1"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.8"
+        }
+      ]
+    },
+    {
+      "nachname": "Eberli",
+      "vorname": "Marc",
+      "jg": "2013",
+      "verein": "Luzern BTV STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "10.8"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.85"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.2"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "2.5",
+          "endNote": "9.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        }
+      ]
+    },
+    {
+      "nachname": "Gutknecht",
+      "vorname": "Livio",
+      "jg": "2015",
+      "verein": "Luzern BTV STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11.2"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.3"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "12.3"
+        }
+      ]
+    },
+    {
+      "nachname": "Bucher",
+      "vorname": "Henry",
+      "jg": "2013",
+      "verein": "Rain STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "10.3"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "2.5",
+          "endNote": "8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.8"
+        }
+      ]
+    },
+    {
+      "nachname": "Fankhauser",
+      "vorname": "Dario",
+      "jg": "2013",
+      "verein": "Rain STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.05"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.5"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11"
+        },
+        {
+          "dNote": "2.5",
+          "endNote": "9.1"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.4"
+        }
+      ]
+    },
+    {
+      "nachname": "Graber",
+      "vorname": "Manuel",
+      "jg": "2013",
+      "verein": "Rain STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "4",
+          "endNote": "12.8"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.25"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "8.7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "12.3"
+        }
+      ]
+    },
+    {
+      "nachname": "Waller",
+      "vorname": "Ramon",
+      "jg": "2013",
+      "verein": "Rain STV",
+      "kat": "P2",
+      "groupIndex": 3,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.05"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.7"
+        },
+        {
+          "dNote": "2.5",
+          "endNote": "9.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "12.1"
+        }
+      ]
+    },
+    {
+      "nachname": "Bucheli",
+      "vorname": "Luca",
+      "jg": "2015",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P2",
+      "groupIndex": 4,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12.05"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.3"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "9.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.6"
+        }
+      ]
+    },
+    {
+      "nachname": "Bucher",
+      "vorname": "Leano",
+      "jg": "2015",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P2",
+      "groupIndex": 4,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "2",
+          "endNote": "8.6"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.1"
+        },
+        {
+          "dNote": "0.7",
+          "endNote": "6.7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9"
+        }
+      ]
+    },
+    {
+      "nachname": "Bühler",
+      "vorname": "Finn",
+      "jg": "2014",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P2",
+      "groupIndex": 4,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12.15"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.9"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.9"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.6"
+        }
+      ]
+    },
+    {
+      "nachname": "Iseli",
+      "vorname": "William",
+      "jg": "2013",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P2",
+      "groupIndex": 4,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.2"
+        },
+        {
+          "dNote": "4",
+          "endNote": "11.2"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "8.6"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.5"
+        }
+      ]
+    },
+    {
+      "nachname": "Marti",
+      "vorname": "Alessandro",
+      "jg": "2012",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P2",
+      "groupIndex": 4,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12.35"
+        },
+        {
+          "dNote": "4",
+          "endNote": "11"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.9"
+        },
+        {
+          "dNote": "4.2",
+          "endNote": "10.1"
+        },
+        {
+          "dNote": "3.4",
+          "endNote": "12.9"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.7"
+        }
+      ]
+    },
+    {
+      "nachname": "Ryser",
+      "vorname": "Linus",
+      "jg": "2013",
+      "verein": "Neuenkirch TV STV",
+      "kat": "P2",
+      "groupIndex": 4,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "11.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.1"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "9.2"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.8"
+        },
+        {
+          "dNote": "3",
+          "endNote": "8.8"
+        }
+      ]
+    },
+    {
+      "nachname": "Kettern",
+      "vorname": "Benjamin",
+      "jg": "2017",
+      "verein": "Luzern BTV STV",
+      "kat": "P1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "12.5"
+        },
+        {
+          "dNote": "4",
+          "endNote": "13.2"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.3"
+        },
+        {
+          "dNote": "4.1",
+          "endNote": "12.5"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.4"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.65"
+        }
+      ]
+    },
+    {
+      "nachname": "Pfulg",
+      "vorname": "Noa",
+      "jg": "2017",
+      "verein": "Luzern BTV STV",
+      "kat": "P1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12.6"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11"
+        },
+        {
+          "dNote": "4",
+          "endNote": "11.9"
+        },
+        {
+          "dNote": "3.6",
+          "endNote": "11.9"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.5"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.6"
+        }
+      ]
+    },
+    {
+      "nachname": "Spiridonov",
+      "vorname": "Luka",
+      "jg": "2016",
+      "verein": "Luzern BTV STV",
+      "kat": "P1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "3.5",
+          "endNote": "12.2"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.4"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.5"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.9"
+        },
+        {
+          "dNote": "4",
+          "endNote": "12.8"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12"
+        }
+      ]
+    },
+    {
+      "nachname": "Eigensatz",
+      "vorname": "Roby",
+      "jg": "2014",
+      "verein": "Rain STV",
+      "kat": "P1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "12.4"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3.6",
+          "endNote": "12.5"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.1"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.3"
+        }
+      ]
+    },
+    {
+      "nachname": "Mainetti",
+      "vorname": "Enea",
+      "jg": "2014",
+      "verein": "Rain STV",
+      "kat": "P1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11.5"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.2"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "12.2"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3.5",
+          "endNote": "11.4"
+        }
+      ]
+    },
+    {
+      "nachname": "Waller",
+      "vorname": "Linus",
+      "jg": "2016",
+      "verein": "Rain STV",
+      "kat": "P1",
+      "groupIndex": 5,
+      "notes": [
+        {
+          "dNote": "3",
+          "endNote": "11"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.7"
+        },
+        {
+          "dNote": "3",
+          "endNote": "11.5"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.1"
+        },
+        {
+          "dNote": "3",
+          "endNote": "10.9"
+        }
+      ]
+    }
+  ]
+}
