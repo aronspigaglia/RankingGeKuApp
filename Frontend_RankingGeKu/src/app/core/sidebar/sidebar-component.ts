@@ -42,6 +42,25 @@ export class SidebarComponent {
     });
   }
 
+  /** Dreht die Noten so, dass Index 0 immer "Boden", 1 "Pferd", ... ist.
+   *  Hintergrund: Gruppe 2 startet am Pferd, deshalb muss deren D1-Note
+   *  an Position "Pferd" (Index 1) landen. */
+  private normalizeNotesForApparatus(
+    notes: RankingAthleteDto['notes'],
+    groupOffset: number
+  ): RankingAthleteDto['notes'] {
+    const len = this.apparatus.length;
+    const padded = Array.from({ length: len }, (_, i) => notes?.[i] ?? {});
+    const shift = ((groupOffset % len) + len) % len; // sicher positiv
+
+    const normalized = Array.from({ length: len }, () => ({}));
+    for (let i = 0; i < len; i++) {
+      const apparatusIdx = (shift + i) % len;
+      normalized[apparatusIdx] = padded[i];
+    }
+    return normalized;
+  }
+
   triggerFileDialog() {
     this.fileInput.nativeElement.click();
   }
@@ -121,7 +140,7 @@ export class SidebarComponent {
           verein: a.verein,
           kat: a.kat,
           groupIndex: gIndex + 1,
-          notes: a.notes,
+          notes: this.normalizeNotesForApparatus(a.notes, gIndex),
         });
       });
     });
