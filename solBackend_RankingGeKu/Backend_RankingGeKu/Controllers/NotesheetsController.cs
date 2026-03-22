@@ -49,15 +49,33 @@ public class NotesheetsController : ControllerBase
             for (int d = 1; d <= 6; d++)
             {
                 int appIndex = (d - 1 + g) % 6;  // Rotation je Gruppe
+                var appName = apparatus[appIndex];
+                var isPferdOrRing = appName is "Pferd" or "Ring";
+
+                // Für Pferd/Ring: EPA-Athleten überspringen; wenn gesamte Gruppe EPA, Sektion weglassen
+                var sectionData = isPferdOrRing
+                    ? groupData.Where(a => !IsEpa(a.Kat)).ToList()
+                    : groupData;
+
+                if (isPferdOrRing && sectionData.Count == 0)
+                    continue; // ganze Gruppe EPA -> keine Sektion erzeugen
+
                 // Titel zweizeilig: Apparatur oben, darunter Durchgang/Gruppe (per \n, wird in LaTeX zu \\)
-                string title = $"{apparatus[appIndex]}\nDurchgang {d}, Gruppe {g + 1}";
-                sections.Add((title, groupData));
+                string title = $"{appName}\nDurchgang {d}, Gruppe {g + 1}";
+                sections.Add((title, sectionData));
             }
         }
+
+        if (sections.Count == 0)
+            return BadRequest("Keine Notenblätter erzeugt (alle Gruppen EPA an Pferd/Ring).");
 
         var tex = _latexBuilder.BuildMany(sections);
         var pdfBytes = await _pdfCompiler.CompileAsync(tex, ct);
 
         return File(pdfBytes, "application/pdf", $"Notenblaetter");
     }
+
+    private static bool IsEpa(string? kat) =>
+        !string.IsNullOrWhiteSpace(kat) &&
+        string.Equals(kat.Trim(), "EPA", StringComparison.OrdinalIgnoreCase);
 }
