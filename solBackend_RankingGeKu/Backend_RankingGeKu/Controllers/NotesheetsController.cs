@@ -1,3 +1,5 @@
+using Backend_RankingGeKu.Domain;
+using Backend_RankingGeKu.Models;
 using Backend_RankingGeKu.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +22,7 @@ public class NotesheetsController : ControllerBase
 
     /// <summary>
     /// Nimmt eine CSV (ohne Header; Gruppen mit "-" getrennt), erzeugt EIN PDF:
-    /// für jede Gruppe 6 Sektionen (Durchgang 1..6) mit rotiertem Apparat (Boden..Reck).
+    /// für jede Gruppe 6 Sektionen (Durchgang 1..6) mit rotiertem Gerät (Boden..Reck).
     /// </summary>
     [HttpPost("merged")]
     [Consumes("multipart/form-data")]
@@ -34,37 +36,8 @@ public class NotesheetsController : ControllerBase
         await file.CopyToAsync(ms, ct);
         ms.Position = 0;
 
-        // Gruppen aus CSV lesen (ohne Kopf; "-" trennt Gruppen)
         var groups = await _csvParser.ParseGroupsAsync(ms, delimiter);
-
-        // Apparate (Reihenfolge fix)
-        var apparatus = new[] { "Boden", "Pferd", "Ring", "Sprung", "Barren", "Reck" };
-
-        // Sektionen: je Gruppe 6 Durchgänge, Apparat rotiert pro Gruppe
-        var sections = new List<(string Title, List<Backend_RankingGeKu.Models.AthleteDto> Data)>();
-        for (int g = 0; g < groups.Count; g++)
-        {
-            var groupData = groups[g];
-
-            for (int d = 1; d <= 6; d++)
-            {
-                int appIndex = (d - 1 + g) % 6;  // Rotation je Gruppe
-                var appName = apparatus[appIndex];
-                var isPferdOrRing = appName is "Pferd" or "Ring";
-
-                // Für Pferd/Ring: EPA-Athleten überspringen; wenn gesamte Gruppe EPA, Sektion weglassen
-                var sectionData = isPferdOrRing
-                    ? groupData.Where(a => !IsEpa(a.Kat)).ToList()
-                    : groupData;
-
-                if (isPferdOrRing && sectionData.Count == 0)
-                    continue; // ganze Gruppe EPA -> keine Sektion erzeugen
-
-                // Titel zweizeilig: Apparatur oben, darunter Durchgang/Gruppe (per \n, wird in LaTeX zu \\)
-                string title = $"{appName}\nDurchgang {d}, Gruppe {g + 1}";
-                sections.Add((title, sectionData));
-            }
-        }
+        var sections = BuildSections(groups);
 
         if (sections.Count == 0)
             return BadRequest("Keine Notenblätter erzeugt (alle Gruppen EPA an Pferd/Ring).");
@@ -72,10 +45,41 @@ public class NotesheetsController : ControllerBase
         var tex = _latexBuilder.BuildMany(sections);
         var pdfBytes = await _pdfCompiler.CompileAsync(tex, ct);
 
-        return File(pdfBytes, "application/pdf", $"Notenblaetter");
+        return File(pdfBytes, "application/pdf", "Notenblaetter");
     }
 
-    private static bool IsEpa(string? kat) =>
-        !string.IsNullOrWhiteSpace(kat) &&
-        string.Equals(kat.Trim(), "EPA", StringComparison.OrdinalIgnoreCase);
+    /// <summary>
+    /// Je Gruppe 6 Durchgänge; das Gerät rotiert pro Gruppe (Gruppe 2 startet am Pferd usw.).
+    /// EPA-Athleten turnen nicht an Pferd/Ring: sie werden dort weggelassen,
+    /// besteht die ganze Gruppe aus EPA, entfällt die Sektion.
+    /// </summary>
+    private static List<(string Title, List<AthleteDto> Data)> BuildSections(List<List<AthleteDto>> groups)
+    {
+        var sections = new List<(string Title, List<AthleteDto> Data)>();
+
+        for (int g = 0; g < groups.Count; g++)
+        {
+            var groupData = groups[g];
+
+            for (int d = 1; d <= Gymnastics.ApparatusCount; d++)
+            {
+                int appIndex = (d - 1 + g) % Gymnastics.ApparatusCount; // Rotation je Gruppe
+                var appName = Gymnastics.DefaultApparatus[appIndex];
+                var isExcludedForEpa = Gymnastics.IsEpaExcludedApparatus(appName);
+
+                var sectionData = isExcludedForEpa
+                    ? groupData.Where(a => !Gymnastics.IsEpa(a.Kat)).ToList()
+                    : groupData;
+
+                if (isExcludedForEpa && sectionData.Count == 0)
+                    continue; // ganze Gruppe EPA -> keine Sektion erzeugen
+
+                // Titel zweizeilig: Gerät oben, darunter Durchgang/Gruppe (per \n, wird in LaTeX zu \\)
+                var title = $"{appName}\nDurchgang {d}, Gruppe {g + 1}";
+                sections.Add((title, sectionData));
+            }
+        }
+
+        return sections;
+    }
 }
