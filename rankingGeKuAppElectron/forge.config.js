@@ -1,18 +1,27 @@
 const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
-// Sign helper (macOS Binaries)
-const { sign } = require('@electron/osx-sign');
 const pkg = require('./package.json');
 
 const entitlementsPath = path.join(__dirname, 'entitlements.plist');
 
-module.exports = {
-  packagerConfig: {
-    asar: true,
-    // Icon für App (macOS .icns, Windows .ico) – basename ohne Endung
-    icon: path.join(__dirname, 'assets', 'icons', 'icon'),
-    // macOS: Signieren + Notarisieren (Zertifikate + Notary-Creds per ENV)
+/**
+ * macOS: Signieren + Notarisieren.
+ * - Läuft nur auf macOS; mit SKIP_MAC_SIGN=1 wird unsigniert gebaut (lokale Tests).
+ * - Signatur-Identität: APPLE_IDENTITY (Default "Developer ID Application", wird in der Keychain gesucht).
+ * - Notarisierung: sind APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD und APPLE_TEAM_ID gesetzt (CI),
+ *   werden diese verwendet; sonst das Keychain-Profil APPLE_KEYCHAIN_PROFILE (Default "AC_PASSWORD", lokal).
+ * Eingebettete Binaries (Backend, Tectonic) signiert @electron/osx-sign automatisch mit.
+ */
+function macSigningConfig() {
+  if (process.platform !== 'darwin' || process.env.SKIP_MAC_SIGN === '1') return {};
+
+  const { APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID } = process.env;
+  const credentials = APPLE_ID && APPLE_APP_SPECIFIC_PASSWORD && APPLE_TEAM_ID
+    ? { appleId: APPLE_ID, appleIdPassword: APPLE_APP_SPECIFIC_PASSWORD, teamId: APPLE_TEAM_ID }
+    : { keychainProfile: process.env.APPLE_KEYCHAIN_PROFILE || 'AC_PASSWORD' };
+
+  return {
     osxSign: {
       identity: process.env.APPLE_IDENTITY || 'Developer ID Application',
       hardenedRuntime: true,
@@ -20,14 +29,16 @@ module.exports = {
       'entitlements-inherit': entitlementsPath,
       gatekeeperAssess: false,
     },
-    osxNotarize: {
-      tool: 'notarytool',
-      // Bevorzugt Keychain-Profile (z.B. "AC_PASSWORD"); fällt sonst auf ENV zurück
-      keychainProfile: process.env.APPLE_KEYCHAIN_PROFILE || 'AC_PASSWORD',
-      appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
-      teamId: process.env.APPLE_TEAM_ID,
-    },
+    osxNotarize: { tool: 'notarytool', ...credentials },
+  };
+}
+
+module.exports = {
+  packagerConfig: {
+    asar: true,
+    // Icon für App (macOS .icns, Windows .ico) – basename ohne Endung
+    icon: path.join(__dirname, 'assets', 'icons', 'icon'),
+    ...macSigningConfig(),
     /**
      * Zusätzliche Ressourcen, die neben der asar in die App gelegt werden.
      * Hier: das gepublishte .NET-Backend, das du nach app/backend ausgibst.
@@ -97,26 +108,5 @@ module.exports = {
         }
       }
     },
-        /**
-     * Signiert die eingebetteten Binaries (Backend + Tectonic), damit Gatekeeper sie nicht blockt.
-     */
-    async afterSign(context) {
-      if (context.electronPlatformName !== 'darwin') return;
-      const identity = process.env.APPLE_IDENTITY || 'Developer ID Application';
-      const appPath = path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
-      const bins = [
-        path.join(appPath, 'Contents/Resources/backend/Backend_RankingGeKu'),
-        path.join(appPath, 'Contents/Resources/backend/tectonic/macos/tectonic'),
-      ];
-      for (const file of bins) {
-        try {
-          await sign({ file, identity });
-          console.log(`Signed ${path.basename(file)}`);
-        } catch (e) {
-          console.error(`Signing failed for ${file}: ${e.message}`);
-          throw e;
-        }
-      }
-    }
-  }
+  },
 };
