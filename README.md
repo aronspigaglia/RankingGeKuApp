@@ -106,10 +106,54 @@ npm start
 
 ### Release bauen
 
+#### Automatisch per GitHub Actions (empfohlen)
+
+Der Workflow [.github/workflows/release.yml](.github/workflows/release.yml) baut bei jedem Tag `vX.Y.Z`
+die App auf einem macOS-Runner (arm64, signiert + notarisiert) und einem Windows-Runner (x64) und
+hängt die Installer an ein GitHub-Release. Ablauf:
+
+```bash
+cd rankingGeKuAppElectron
+npm version 2.1.0 --no-git-tag-version      # Version in package.json erhöhen
+git commit -am "Version 2.1.0"
+git tag v2.1.0
+git push origin main --tags                 # Tag startet die Pipeline
+```
+
+Der Tag muss zur Version in `rankingGeKuAppElectron/package.json` passen, sonst bricht der Workflow ab.
+Nach ca. 15–20 Minuten liegt unter *Releases* ein Eintrag mit `RankingGeKu-mac-m-chip-<version>.zip`
+und `RankingGeKu-win-x64-Setup.exe`. Über *Actions → Release → Run workflow* lässt sich der Build auch
+ohne Tag testen; die Installer landen dann als Workflow-Artifacts.
+
+Einmalig müssen diese **Repository-Secrets** gesetzt werden (Settings → Secrets and variables → Actions):
+
+| Secret | Inhalt |
+|---|---|
+| `MACOS_CERTIFICATE_P12` | base64-kodiertes `.p12` mit dem Zertifikat *Developer ID Application* + Private Key |
+| `MACOS_CERTIFICATE_PASSWORD` | Passwort, das beim Export des `.p12` vergeben wurde |
+| `APPLE_ID` | Apple-ID (E-Mail) des Developer-Accounts |
+| `APPLE_APP_SPECIFIC_PASSWORD` | App-spezifisches Passwort von <https://appleid.apple.com> (Anmeldung und Sicherheit) |
+| `APPLE_TEAM_ID` | Team-ID (10 Zeichen, steht in Klammern im Zertifikatsnamen) |
+
+Zertifikat exportieren: Schlüsselbundverwaltung öffnen → Kategorie *Meine Zertifikate* →
+*Developer ID Application: …* mit Rechtsklick exportieren → Format `.p12`, Passwort vergeben. Danach:
+
+```bash
+base64 -i zertifikat.p12 | pbcopy    # Inhalt der Zwischenablage als MACOS_CERTIFICATE_P12 eintragen
+```
+
+Der Windows-Installer ist nicht signiert; beim ersten Start erscheint die SmartScreen-Warnung
+(*Weitere Informationen → Trotzdem ausführen*).
+
+#### Manuell
+
 Die Build-Skripte liegen in `rankingGeKuAppElectron/package.json`:
 
 ```bash
 cd rankingGeKuAppElectron
 npm run make:mac   # Frontend + Backend (osx-arm64) publishen, dann Electron-Forge make
-npm run make:win   # dito für Windows (win-x64)
+npm run make:win   # dito für Windows (win-x64); muss auf einem Windows-Rechner laufen
 ```
+
+Auf macOS wird dabei standardmässig signiert (Keychain-Profil `AC_PASSWORD` für die Notarisierung).
+Mit `SKIP_MAC_SIGN=1 npm run make:mac` entsteht ein unsignierter Build für lokale Tests.
