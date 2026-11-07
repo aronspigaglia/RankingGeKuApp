@@ -54,7 +54,7 @@ Die App besteht aus drei Teilen, die zusammen als Desktop-App ausgeliefert werde
 
 | Baustein | Aufgabe |
 |---|---|
-| `core/sidebar/` | Buttons: CSV-Import, PDF-Erzeugung, Export/Import des Zwischenstands, Alles löschen |
+| `core/sidebar/` | Buttons: CSV-Import, PDF-Erzeugung, Export/Import des Zwischenstands, Alles löschen; Textfeld „Veranstaltung / Datum" für den Footer der Rangliste |
 | `features/content/` | Noteneingabe-Tabellen pro Gruppe, Tabs D1–D6 |
 | `services/notes-state.service.ts` | Zentraler Zustand (Gruppen + Noten), persistiert jeden Stand in `localStorage` |
 | `services/notesheets-api.service.ts` | HTTP-Client für die beiden Backend-Endpoints |

@@ -9,6 +9,9 @@ interface PersistedState {
   groups: Athlete[][];
 }
 
+/** Vorbelegung für den Veranstaltungstext, solange der Benutzer noch nichts eingetragen hat. */
+export const DEFAULT_COMPETITION_NAME = 'Geku Rickenbach 21/22 März 2026';
+
 /**
  * Hält die importierten Athleten-Gruppen samt Noten und
  * persistiert jeden Stand in localStorage.
@@ -16,6 +19,8 @@ interface PersistedState {
 @Injectable({ providedIn: 'root' })
 export class NotesStateService {
   private readonly STORAGE_KEY = 'ranking-geku-state-v1';
+  /** Eigener Schlüssel: der Veranstaltungstext überlebt "Alles löschen". */
+  private readonly COMPETITION_KEY = 'ranking-geku-competition-v1';
 
   private readonly groupsSubject = new BehaviorSubject<Athlete[][]>([]);
   readonly groups$ = this.groupsSubject.asObservable();
@@ -25,6 +30,10 @@ export class NotesStateService {
 
   private readonly categoriesSubject = new BehaviorSubject<string[]>([]);
   readonly categories$ = this.categoriesSubject.asObservable();
+
+  /** Veranstaltungstext (Ort + Datum), erscheint im Footer der Rangliste. */
+  private readonly competitionNameSubject = new BehaviorSubject<string>(DEFAULT_COMPETITION_NAME);
+  readonly competitionName$ = this.competitionNameSubject.asObservable();
 
   /** Original-CSV (ohne Noten), wird fürs Erzeugen der Notenblätter gebraucht. */
   private rawCsv: string | null = null;
@@ -37,9 +46,28 @@ export class NotesStateService {
     return this.groupsSubject.value;
   }
 
+  getCompetitionName(): string {
+    return this.competitionNameSubject.value;
+  }
+
+  /** Veranstaltungstext setzen und merken (separat vom Wettkampf-Zustand). */
+  setCompetitionName(name: string): void {
+    this.competitionNameSubject.next(name);
+    try {
+      localStorage.setItem(this.COMPETITION_KEY, name);
+    } catch {
+      // Speicher nicht verfügbar: Wert gilt nur für diese Sitzung
+    }
+  }
+
   /** Beim App-Start aufrufen: lädt vorhandenen Zustand aus localStorage. */
   loadFromStorage(): void {
     try {
+      const competition = localStorage.getItem(this.COMPETITION_KEY);
+      if (competition !== null) {
+        this.competitionNameSubject.next(competition);
+      }
+
       const raw = localStorage.getItem(this.STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as PersistedState;

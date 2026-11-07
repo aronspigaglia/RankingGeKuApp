@@ -28,11 +28,15 @@ export class SidebarComponent {
   categories: string[] = [];
   selectedCategory: string | null = null;
 
+  /** Veranstaltungstext für den Footer der Rangliste (wird im State gemerkt). */
+  competitionName = '';
+
   constructor(
     private state: NotesStateService,
     private api: NotesheetsApiService,
   ) {
     this.state.imported$.subscribe(v => (this.imported = v));
+    this.state.competitionName$.subscribe(v => (this.competitionName = v));
     this.state.categories$.subscribe(cats => {
       this.categories = cats;
       if (cats.length > 0 && !this.selectedCategory) {
@@ -105,7 +109,7 @@ export class SidebarComponent {
       const json = JSON.stringify(payload, null, 2);
       const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
       const fileBase =
-        payload.competitionName?.trim().replace(/[^a-z0-9_-]+/gi, '_') || 'noten_export';
+        payload.competitionName?.trim().replace(/[^\p{L}\p{N}_-]+/gu, '_') || 'noten_export';
       downloadBlob(blob, `${fileBase}.json`);
     } finally {
       this.busyExport = false;
@@ -134,6 +138,12 @@ export class SidebarComponent {
       }
 
       this.state.loadFromImportedAthletes(payload.athletes);
+
+      // Veranstaltungstext mitnehmen; "GeKu Rangliste" war in älteren Exporten nur ein fixer Platzhalter
+      const importedName = payload.competitionName?.trim();
+      if (importedName && importedName !== 'GeKu Rangliste') {
+        this.state.setCompetitionName(importedName);
+      }
       this.errorMsg = '';
     } catch (err: any) {
       this.errorMsg =
@@ -141,6 +151,12 @@ export class SidebarComponent {
     } finally {
       input.value = '';
     }
+  }
+
+  // --- Veranstaltungstext (Footer der Rangliste) -----------------------------
+
+  onCompetitionNameChange(value: string): void {
+    this.state.setCompetitionName(value);
   }
 
   // --- Alles löschen --------------------------------------------------------
@@ -193,7 +209,7 @@ export class SidebarComponent {
     });
 
     return {
-      competitionName: 'GeKu Rangliste', // später dynamisch
+      competitionName: this.competitionName.trim(),
       apparatus: APPARATUS,
       athletes,
     };

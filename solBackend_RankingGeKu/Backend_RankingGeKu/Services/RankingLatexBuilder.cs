@@ -11,16 +11,18 @@ public class RankingLatexBuilder
     /// <param name="rows">Bereits gefilterte und sortierte Zeilen der Kategorie.</param>
     /// <param name="apparatus">Alle Geräte-Namen (Index passend zu den Noten-Arrays).</param>
     /// <param name="visibleDeviceIndices">Indizes der Geräte, die als Spalten erscheinen.</param>
+    /// <param name="footerText">Veranstaltungstext links im Footer, z. B. "Geku Rickenbach 21/22 März 2026".</param>
     public string Build(
         string title,
         IReadOnlyList<RankingRow> rows,
         IReadOnlyList<string> apparatus,
-        IReadOnlyList<int> visibleDeviceIndices)
+        IReadOnlyList<int> visibleDeviceIndices,
+        string footerText)
     {
         var body = new StringBuilder();
         body.AppendLine($@"\section*{{{LatexEscaper.Escape(title)}}}");
         AppendTable(body, rows, apparatus, visibleDeviceIndices);
-        return WrapDocument(body.ToString());
+        return WrapDocument(body.ToString(), LatexEscaper.Escape(footerText));
     }
 
     /// <summary>Tabelle: Ausz., Rang, Name, Verein, JG, pro Gerät (E / D / Rang), Total.</summary>
@@ -88,7 +90,8 @@ public class RankingLatexBuilder
     private static string FormatScore(decimal value) =>
         value.ToString("0.00", CultureInfo.InvariantCulture);
 
-    private static string WrapDocument(string body) => $@"
+    /// <param name="footerText">Bereits LaTeX-escapeter Footer-Text.</param>
+    private static string WrapDocument(string body, string footerText) => $@"
 \documentclass[10pt]{{article}}
 \usepackage[a4paper,landscape,top=12mm,bottom=18mm,left=10mm,right=10mm,includefoot]{{geometry}}
 \usepackage[T1]{{fontenc}}
@@ -121,7 +124,7 @@ public class RankingLatexBuilder
 \renewcommand{{\footrulewidth}}{{0pt}}
 \lhead{{\small {DateTime.UtcNow:dd.MM.yyyy}}}
 \rhead{{\includegraphics[height=14mm]{{{{geku-logo.png}}}}}}
-\lfoot{{\small Geku Rickenbach 21/22 März 2026}}
+\lfoot{{\small {footerText}}}
 \cfoot{{\small www.geku.ch}}
 \rfoot{{\includegraphics[height=10mm]{{{{alltex-logo.png}}}}\hspace{{5mm}}\includegraphics[height=10mm]{{{{Schaerli_und_Partner-logo.png}}}}}}
 

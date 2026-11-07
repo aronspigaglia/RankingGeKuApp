@@ -66,7 +66,9 @@ public class RankingController : ControllerBase
             .ThenBy(r => r.Vorname)
             .ToList();
 
-        var latex = _latexBuilder.Build(title, katRows, apparatus, visibleDeviceIndices);
+        // Veranstaltungstext (z. B. "Geku Rickenbach 21/22 März 2026") kommt vom Frontend und landet im Footer
+        var footerText = request.CompetitionName?.Trim() ?? string.Empty;
+        var latex = _latexBuilder.Build(title, katRows, apparatus, visibleDeviceIndices, footerText);
         var pdfBytes = await _pdfCompiler.CompileAsync(latex, ct);
 
         var fileName = distinctKats.Count == 1 && !string.IsNullOrWhiteSpace(distinctKats[0])
