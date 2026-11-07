@@ -13,12 +13,8 @@ if (process.platform === 'win32' && process.argv.includes('--squirrel-firstrun')
 let mainWindow;
 let backendProcess;
 
-// Dev = alles ausser production
-//const isDev = !app.isPackaged;
-
-//const isDev = process.env.NODE_ENV !== 'production';
-
-const isDev = false; // Temporär für Tests, bis Packaging klappt
+// true = Angular-Dev-Server (localhost:4200) + externes Backend (dotnet run)
+const isDev = false;
 
 // Pfade relativ zu diesem File
 const appRoot = app.isPackaged ? app.getAppPath() : __dirname;
@@ -32,17 +28,9 @@ const assetsPath = app.isPackaged
   : path.join(appRoot, 'assets');
 
 function startBackend() {
-  // HIER den exakten Namen deiner gepublishten Binary eintragen
-  // ls app/backend → z.B. Backend_RankingGeKu
-  let backendExe;
-
-  if (process.platform === 'win32') {
-    // Windows: exe
-    backendExe = 'Backend_RankingGeKu.exe';
-  } else {
-    // macOS / Linux: ohne .exe
-    backendExe = 'Backend_RankingGeKu';
-  }
+  const backendExe = process.platform === 'win32'
+    ? 'Backend_RankingGeKu.exe'
+    : 'Backend_RankingGeKu';
 
   const exePath = path.join(backendPath, backendExe);
   console.log('Starte Backend:', exePath);
@@ -86,16 +74,16 @@ function createWindow() {
   }
 
   mainWindow = new BrowserWindow({
-  width: 1200,
-  height: 800,
-  icon: path.join(
-    assetsPath,
-    'icons',
-    process.platform === 'win32' ? 'icon.ico' : 'icon.icns'
-  ),
-  webPreferences: {
-    nodeIntegration: false,
-    contextIsolation: true
+    width: 1200,
+    height: 800,
+    icon: path.join(
+      assetsPath,
+      'icons',
+      process.platform === 'win32' ? 'icon.ico' : 'icon.icns'
+    ),
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
     }
   });
 

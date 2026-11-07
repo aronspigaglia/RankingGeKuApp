@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { RankingRequestDto } from '../models/ranking-request';
 
+/** HTTP-Client für das lokale Backend (PDF-Erzeugung). */
 @Injectable({ providedIn: 'root' })
 export class NotesheetsApiService {
-  // adjust if you use environments
-  private baseUrl = 'http://127.0.0.1:5157';
+  private readonly baseUrl = 'http://127.0.0.1:5157';
 
   constructor(private http: HttpClient) {}
 
-  /** Sends CSV as file to /api/notesheets/merged and returns the PDF (Blob). */
+  /** Schickt die Athleten-CSV an /api/notesheets/merged und liefert die PDF als Blob. */
   uploadCsvAndGetMergedPdf(csvText: string, delimiter = ';') {
     const blob = new Blob([csvText], { type: 'text/csv' });
     const file = new File([blob], 'athleten.csv', { type: 'text/csv' });
@@ -22,11 +22,12 @@ export class NotesheetsApiService {
       { responseType: 'blob', observe: 'response' as const }
     );
   }
+
+  /** Schickt die Noten an /api/ranking und liefert die Ranglisten-PDF als Blob. */
   generateRankingPdf(payload: RankingRequestDto) {
-    return this.http.post(
-      `${this.baseUrl}/api/ranking`,   // Endpoint implementieren wir später im Backend
-      payload,
-      { responseType: 'blob', observe: 'response' as const }
-    );
+    return this.http.post(`${this.baseUrl}/api/ranking`, payload, {
+      responseType: 'blob',
+      observe: 'response' as const,
+    });
   }
 }

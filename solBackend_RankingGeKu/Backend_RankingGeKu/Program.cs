@@ -9,6 +9,8 @@ var enginePath = PdfCompiler.ResolveEnginePath(builder.Configuration.GetSection(
 builder.Services.AddSingleton(new PdfCompiler(enginePath));
 builder.Services.AddSingleton<CsvParser>();
 builder.Services.AddSingleton<LatexBuilder>();
+builder.Services.AddSingleton<RankingCalculator>();
+builder.Services.AddSingleton<RankingLatexBuilder>();
 
 builder.Services.AddCors(o => o.AddPolicy("local", p =>
     p.AllowAnyOrigin()

@@ -2,8 +2,18 @@ using System.Diagnostics;
 
 namespace Backend_RankingGeKu.Services;
 
+/// <summary>Kompiliert LaTeX-Quelltext mit Tectonic zu einem PDF.</summary>
 public class PdfCompiler
 {
+    private static readonly TimeSpan CompileTimeout = TimeSpan.FromSeconds(60);
+
+    private static readonly string[] LogoAssets =
+    {
+        "geku-logo.png",
+        "alltex-logo.png",
+        "Schaerli_und_Partner-logo.png"
+    };
+
     private readonly string _enginePath;
 
     // enginePath: "tectonic" (im PATH) oder absoluter Pfad zur exe
@@ -13,7 +23,7 @@ public class PdfCompiler
     }
 
     /// <summary>
-    /// Prefer a bundled Tectonic (app/backend/tectonic/<platform>/tectonic[.exe]),
+    /// Prefer a bundled Tectonic (app/backend/tectonic/&lt;platform&gt;/tectonic[.exe]),
     /// fall back to an explicitly configured path, then PATH lookup ("tectonic").
     /// </summary>
     public static string ResolveEnginePath(string? configuredPath = null)
@@ -25,24 +35,10 @@ public class PdfCompiler
         }
 
         var exeName = OperatingSystem.IsWindows() ? "tectonic.exe" : "tectonic";
-        string? platform = null;
-
-        if (OperatingSystem.IsWindows()) platform = "windows";
-        else if (OperatingSystem.IsMacOS()) platform = "macos";
-        else if (OperatingSystem.IsLinux()) platform = "linux";
+        var platform = PlatformFolderName();
 
         // Probe a few likely roots (AppContext + process location) to be robust in packaged apps
-        var candidates = new List<string>();
-        if (!string.IsNullOrWhiteSpace(AppContext.BaseDirectory))
-            candidates.Add(AppContext.BaseDirectory);
-
-        var processDir = Path.GetDirectoryName(Environment.ProcessPath);
-        if (!string.IsNullOrWhiteSpace(processDir))
-            candidates.Add(processDir);
-
-        var cwd = Directory.GetCurrentDirectory();
-        if (!string.IsNullOrWhiteSpace(cwd))
-            candidates.Add(cwd);
+        var candidates = ProbeBaseDirectories();
 
         foreach (var baseDir in candidates)
         {
@@ -85,10 +81,28 @@ public class PdfCompiler
     public async Task<byte[]> CompileAsync(string latexSource, CancellationToken ct = default)
     {
         var workdir = Directory.CreateTempSubdirectory("notesheets_");
-        var texPath = Path.Combine(workdir.FullName, "notesheets.tex");
-        await File.WriteAllTextAsync(texPath, latexSource);
+        try
+        {
+            var texPath = Path.Combine(workdir.FullName, "notesheets.tex");
+            await File.WriteAllTextAsync(texPath, latexSource, ct);
 
-        // Assets (Logos) ins Temp-Verzeichnis kopieren, damit tectonic sie findet
+            CopyLogoAssets(workdir.FullName);
+            await RunTectonicAsync(texPath, workdir.FullName, ct);
+
+            var pdfPath = Path.Combine(workdir.FullName, "notesheets.pdf");
+            if (!File.Exists(pdfPath)) throw new FileNotFoundException("PDF nicht erzeugt.", pdfPath);
+
+            return await File.ReadAllBytesAsync(pdfPath, ct);
+        }
+        finally
+        {
+            try { workdir.Delete(true); } catch { /* ignore */ }
+        }
+    }
+
+    /// <summary>Logos ins Temp-Verzeichnis kopieren, damit Tectonic sie findet. Fehlende Logos sind kein Fehler.</summary>
+    private static void CopyLogoAssets(string workdir)
+    {
         try
         {
             var candidates = new[]
@@ -104,15 +118,14 @@ public class PdfCompiler
                 .Select(p => Path.Combine(p!, "assets"))
                 .FirstOrDefault(Directory.Exists);
 
-            if (assetsDir != null)
+            if (assetsDir == null) return;
+
+            foreach (var name in LogoAssets)
             {
-                foreach (var name in new[] { "geku-logo.png", "alltex-logo.png", "Schaerli_und_Partner-logo.png" })
+                var src = Path.Combine(assetsDir, name);
+                if (File.Exists(src))
                 {
-                    var src = Path.Combine(assetsDir, name);
-                    if (File.Exists(src))
-                    {
-                        File.Copy(src, Path.Combine(workdir.FullName, name), overwrite: true);
-                    }
+                    File.Copy(src, Path.Combine(workdir, name), overwrite: true);
                 }
             }
         }
@@ -120,23 +133,26 @@ public class PdfCompiler
         {
             // Falls Logos fehlen oder Copy fehlschlägt: PDF läuft weiter ohne Header/Footer-Bilder
         }
+    }
 
-        // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden.
+    /// <summary>
+    /// Tectonic-Cache neben dem Backend, um den Kaltstart (Paket-Downloads) zu vermeiden.
+    /// Pro Plattform ein eigener Unterordner, damit macOS/Windows/Linux sich nicht in die Quere kommen.
+    /// </summary>
+    private static string EnsureCacheDir()
+    {
         // Basis: aktuelles WorkingDirectory (wird von Electron auf resources/backend gesetzt)
         var cacheBase = Directory.GetCurrentDirectory();
         if (string.IsNullOrWhiteSpace(cacheBase))
-            cacheBase = AppContext.BaseDirectory; // Fallback
+            cacheBase = AppContext.BaseDirectory;
 
-        // Tectonic-Cache neben dem Backend bundlen, um den Kaltstart zu vermeiden.
-        // Pro Plattform ein eigener Unterordner, damit macOS/Windows/Linux sich nicht in die Quere kommen.
-        var cacheRoot = Path.Combine(cacheBase, "tectonic-cache");
-        var cachePlatform = OperatingSystem.IsWindows() ? "windows"
-            : OperatingSystem.IsMacOS() ? "macos"
-            : OperatingSystem.IsLinux() ? "linux"
-            : "generic";
-        var cacheDir = Path.Combine(cacheRoot, cachePlatform);
+        var cacheDir = Path.Combine(cacheBase, "tectonic-cache", PlatformFolderName() ?? "generic");
         Directory.CreateDirectory(cacheDir);
+        return cacheDir;
+    }
 
+    private async Task RunTectonicAsync(string texPath, string workdir, CancellationToken ct)
+    {
         var psi = new ProcessStartInfo
         {
             FileName = _enginePath,
@@ -144,11 +160,10 @@ public class PdfCompiler
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = workdir.FullName
+            WorkingDirectory = workdir
         };
-        psi.Environment["TECTONIC_CACHE_DIR"] = cacheDir;
+        psi.Environment["TECTONIC_CACHE_DIR"] = EnsureCacheDir();
 
-        // tectonic Argumente
         psi.ArgumentList.Add(Path.GetFileName(texPath));
         psi.ArgumentList.Add("--keep-logs");
         psi.ArgumentList.Add("--keep-intermediates");
@@ -159,11 +174,11 @@ public class PdfCompiler
         var stderrTask = p.StandardError.ReadToEndAsync();
 
         // auf Exit oder Timeout warten, um Hänger zu vermeiden
-        var finished = await Task.WhenAny(p.WaitForExitAsync(ct), Task.Delay(TimeSpan.FromSeconds(60), ct));
+        await Task.WhenAny(p.WaitForExitAsync(ct), Task.Delay(CompileTimeout, ct));
         if (!p.HasExited)
         {
             try { p.Kill(true); } catch { /* ignore */ }
-            throw new Exception("Tectonic hang: aborted after 60s");
+            throw new Exception($"Tectonic hang: aborted after {CompileTimeout.TotalSeconds:0}s");
         }
 
         var stdout = await stdoutTask;
@@ -173,13 +188,32 @@ public class PdfCompiler
         if (!string.IsNullOrWhiteSpace(stdout)) Console.WriteLine(stdout);
         if (!string.IsNullOrWhiteSpace(stderr)) Console.Error.WriteLine(stderr);
         if (p.ExitCode != 0) throw new Exception($"LaTeX-Compiler ExitCode {p.ExitCode}");
+    }
 
-        var pdfPath = Path.Combine(workdir.FullName, "notesheets.pdf");
-        if (!File.Exists(pdfPath)) throw new FileNotFoundException("PDF nicht erzeugt.", pdfPath);
+    /// <summary>Wahrscheinliche Wurzelverzeichnisse (AppContext, Prozess, CWD) für die Suche nach gebündelten Dateien.</summary>
+    private static List<string> ProbeBaseDirectories()
+    {
+        var candidates = new List<string>();
 
-        var bytes = await File.ReadAllBytesAsync(pdfPath, ct);
+        if (!string.IsNullOrWhiteSpace(AppContext.BaseDirectory))
+            candidates.Add(AppContext.BaseDirectory);
 
-        try { workdir.Delete(true); } catch { /* ignore */ }
-        return bytes;
+        var processDir = Path.GetDirectoryName(Environment.ProcessPath);
+        if (!string.IsNullOrWhiteSpace(processDir))
+            candidates.Add(processDir);
+
+        var cwd = Directory.GetCurrentDirectory();
+        if (!string.IsNullOrWhiteSpace(cwd))
+            candidates.Add(cwd);
+
+        return candidates;
+    }
+
+    private static string? PlatformFolderName()
+    {
+        if (OperatingSystem.IsWindows()) return "windows";
+        if (OperatingSystem.IsMacOS()) return "macos";
+        if (OperatingSystem.IsLinux()) return "linux";
+        return null;
     }
 }

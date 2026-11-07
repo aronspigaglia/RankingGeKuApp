@@ -1,11 +1,12 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 import { NotesStateService } from '../../services/notes-state.service';
 import { NotesheetsApiService } from '../../services/notesheets-api.service';
 import { RankingAthleteDto, RankingRequestDto } from '../../models/ranking-request';
-import { firstValueFrom } from 'rxjs';
-import { FormsModule } from '@angular/forms';
-
-
+import { APPARATUS, NOTE_COUNT } from '../../models/gymnastics';
+import { downloadBlob, filenameFromContentDisposition } from '../../shared/file-download';
 
 @Component({
   imports: [FormsModule],
@@ -24,8 +25,6 @@ export class SidebarComponent {
   busyImport = false;
   errorMsg = '';
 
-  readonly apparatus = ['Boden', 'Pferd', 'Ring', 'Sprung', 'Barren', 'Reck'];
-
   categories: string[] = [];
   selectedCategory: string | null = null;
 
@@ -42,30 +41,13 @@ export class SidebarComponent {
     });
   }
 
-  /** Dreht die Noten so, dass Index 0 immer "Boden", 1 "Pferd", ... ist.
-   *  Hintergrund: Gruppe 2 startet am Pferd, deshalb muss deren D1-Note
-   *  an Position "Pferd" (Index 1) landen. */
-  private normalizeNotesForApparatus(
-    notes: RankingAthleteDto['notes'],
-    groupOffset: number
-  ): RankingAthleteDto['notes'] {
-    const len = this.apparatus.length;
-    const padded = Array.from({ length: len }, (_, i) => notes?.[i] ?? {});
-    const shift = ((groupOffset % len) + len) % len; // sicher positiv
+  // --- Athleten-CSV importieren ------------------------------------------
 
-    const normalized = Array.from({ length: len }, () => ({}));
-    for (let i = 0; i < len; i++) {
-      const apparatusIdx = (shift + i) % len;
-      normalized[apparatusIdx] = padded[i];
-    }
-    return normalized;
-  }
-
-  triggerFileDialog() {
+  triggerFileDialog(): void {
     this.fileInput.nativeElement.click();
   }
 
-  async onFileChange(ev: Event) {
+  async onFileChange(ev: Event): Promise<void> {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
@@ -76,55 +58,118 @@ export class SidebarComponent {
     input.value = '';
   }
 
-  clearAll() {
-    this.state.clear();
-    this.errorMsg = '';
-    this.selectedCategory = null;
-  }
-  onClearClick() {
-  const confirmed = window.confirm(
-    'Bist du sicher, dass alle Daten (CSV, Noten, Ranglisten) gelöscht werden sollen?'
-  );
+  // --- PDFs erzeugen ------------------------------------------------------
 
-  if (!confirmed) {
-    return;
-  }
-
-  this.clearAll();
-}
-
-  async generateNotesheets() {
+  async generateNotesheets(): Promise<void> {
     this.errorMsg = '';
     const csv = this.state.getRawCsv();
     if (!csv) return;
 
     this.busyNotesheets = true;
     try {
-      const res = await firstValueFrom(
-        this.api.uploadCsvAndGetMergedPdf(csv, ';')
-      );
-      const blob = res.body!;
-      const cd = res.headers.get('Content-Disposition') || '';
-      const match = /filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i.exec(cd);
-      const filename = match?.[1] ?? 'Notenblaetter_merged.pdf';
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const res = await firstValueFrom(this.api.uploadCsvAndGetMergedPdf(csv, ';'));
+      this.downloadPdfResponse(res, 'Notenblaetter_merged.pdf');
     } catch (err: any) {
       this.errorMsg = err?.message ?? 'Fehler beim Erzeugen der Notenblätter.';
     } finally {
       this.busyNotesheets = false;
     }
   }
-  private buildRankingPayload(): RankingRequestDto {
+
+  async generateRanking(): Promise<void> {
+    this.errorMsg = '';
+    if (!this.imported) return;
+
+    const payload = this.buildRankingPayload({ onlySelectedCategory: true, normalizeNotes: true });
+
+    this.busyRanking = true;
+    try {
+      const res = await firstValueFrom(this.api.generateRankingPdf(payload));
+      this.downloadPdfResponse(res, 'Rangliste.pdf');
+    } catch (err: any) {
+      this.errorMsg =
+        err?.error?.title ||
+        err?.message ||
+        'Fehler beim Erzeugen der Rangliste.';
+    } finally {
+      this.busyRanking = false;
+    }
+  }
+
+  // --- Zwischenstand exportieren / importieren ----------------------------
+
+  exportData(): void {
+    this.busyExport = true;
+    try {
+      const payload = this.buildRankingPayload({ onlySelectedCategory: false, normalizeNotes: false });
+      const json = JSON.stringify(payload, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+      const fileBase =
+        payload.competitionName?.trim().replace(/[^a-z0-9_-]+/gi, '_') || 'noten_export';
+      downloadBlob(blob, `${fileBase}.json`);
+    } finally {
+      this.busyExport = false;
+    }
+  }
+
+  importData(): void {
+    this.busyImport = true;
+    try {
+      this.importFileInput.nativeElement.click();
+    } finally {
+      this.busyImport = false;
+    }
+  }
+
+  async onImportFileChange(ev: Event): Promise<void> {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text) as RankingRequestDto;
+      if (!payload?.athletes?.length) {
+        throw new Error('Keine Athleten im Import gefunden.');
+      }
+
+      this.state.loadFromImportedAthletes(payload.athletes);
+      this.errorMsg = '';
+    } catch (err: any) {
+      this.errorMsg =
+        err?.message || 'Import fehlgeschlagen. Bitte gültige JSON-Datei wählen.';
+    } finally {
+      input.value = '';
+    }
+  }
+
+  // --- Alles löschen --------------------------------------------------------
+
+  onClearClick(): void {
+    const confirmed = window.confirm(
+      'Bist du sicher, dass alle Daten (CSV, Noten, Ranglisten) gelöscht werden sollen?'
+    );
+    if (!confirmed) return;
+
+    this.state.clear();
+    this.errorMsg = '';
+    this.selectedCategory = null;
+  }
+
+  // --- Helfer ---------------------------------------------------------------
+
+  /**
+   * Baut den Request aus den aktuellen Gruppen.
+   * - onlySelectedCategory: nur Athleten der gewählten Kategorie (für die Rangliste).
+   * - normalizeNotes: Noten von D1..D6 auf Geräte-Position drehen (für die Rangliste);
+   *   der Export behält die rohe D1..D6-Reihenfolge.
+   */
+  private buildRankingPayload(options: {
+    onlySelectedCategory: boolean;
+    normalizeNotes: boolean;
+  }): RankingRequestDto {
     const groups = this.state.getGroupsSnapshot();
-    const selected = this.selectedCategory;
+    const selected = options.onlySelectedCategory ? this.selectedCategory : null;
 
     const athletes: RankingAthleteDto[] = [];
     groups.forEach((group, gIndex) => {
@@ -140,168 +185,45 @@ export class SidebarComponent {
           verein: a.verein,
           kat: a.kat,
           groupIndex: gIndex + 1,
-          notes: this.normalizeNotesForApparatus(a.notes, gIndex),
+          notes: options.normalizeNotes
+            ? this.normalizeNotesForApparatus(a.notes, gIndex)
+            : a.notes,
         });
       });
     });
 
     return {
       competitionName: 'GeKu Rangliste', // später dynamisch
-      apparatus: this.apparatus,
-      athletes,
-    };
-  }
-  private getWholeRankingPayload(): RankingRequestDto {
-    const groups = this.state.getGroupsSnapshot();
-    const selected = this.selectedCategory;
-
-    const athletes: RankingAthleteDto[] = [];
-    groups.forEach((group, gIndex) => {
-      group.forEach(a => {
-        athletes.push({
-          nachname: a.nachname,
-          vorname: a.vorname,
-          jg: a.jg,
-          verein: a.verein,
-          kat: a.kat,
-          groupIndex: gIndex + 1,
-          notes: a.notes,
-        });
-      });
-    });
-
-    return {
-      competitionName: 'GeKu Rangliste',
-      apparatus: this.apparatus,
+      apparatus: APPARATUS,
       athletes,
     };
   }
 
-  async generateRanking() {
-    this.errorMsg = '';
-    if (!this.imported) return;
+  /** Dreht die Noten so, dass Index 0 immer "Boden", 1 "Pferd", ... ist.
+   *  Hintergrund: Gruppe 2 startet am Pferd, deshalb muss deren D1-Note
+   *  an Position "Pferd" (Index 1) landen. */
+  private normalizeNotesForApparatus(
+    notes: RankingAthleteDto['notes'],
+    groupOffset: number
+  ): RankingAthleteDto['notes'] {
+    const padded = Array.from({ length: NOTE_COUNT }, (_, i) => notes?.[i] ?? {});
+    const shift = ((groupOffset % NOTE_COUNT) + NOTE_COUNT) % NOTE_COUNT; // sicher positiv
 
-    const payload = this.buildRankingPayload();
-    
-    this.busyRanking = true;
-    try {
-      const res = await firstValueFrom(this.api.generateRankingPdf(payload));
-      const blob = res.body!;
-      const cd = res.headers.get('Content-Disposition') || '';
-      const match = /filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i.exec(cd);
-      const filename = match?.[1] ?? 'Rangliste.pdf';
-      
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (err: any) {
-      this.errorMsg =
-      err?.error?.title ||
-      err?.message ||
-      'Fehler beim Erzeugen der Rangliste (Backend noch nicht fertig?).';
-    } finally {
-      this.busyRanking = false;
+    const normalized = Array.from({ length: NOTE_COUNT }, () => ({}));
+    for (let i = 0; i < NOTE_COUNT; i++) {
+      const apparatusIdx = (shift + i) % NOTE_COUNT;
+      normalized[apparatusIdx] = padded[i];
     }
+    return normalized;
   }
 
-  exportData() {
-    this.busyExport = true;
-    try {
-      const payload = this.getWholeRankingPayload();
-      const json = JSON.stringify(payload, null, 2);
-      const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const fileBase =
-        payload.competitionName?.trim().replace(/[^a-z0-9_-]+/gi, '_') ||
-        'noten_export';
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileBase}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } finally {
-      this.busyExport = false;
-    }
-  }
-
-  importData() {
-    this.busyImport = true;
-    try {
-      this.importFileInput.nativeElement.click();
-    } finally {
-      this.busyImport = false;
-    }
-  }
-
-  async onImportFileChange(ev: Event) {
-    const input = ev.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const payload = JSON.parse(text) as RankingRequestDto;
-      if (!payload?.athletes?.length) {
-        throw new Error('Keine Athleten im Import gefunden.');
-      }
-
-      const delimiter = ';';
-      const header = [
-        'Gruppe',
-        'Nachname',
-        'Vorname',
-        'JG',
-        'Verein',
-        'Kat',
-        'D1',
-        'END1',
-        'D2',
-        'END2',
-        'D3',
-        'END3',
-        'D4',
-        'END4',
-        'D5',
-        'END5',
-        'D6',
-        'END6',
-      ];
-
-      const lines = [header.join(delimiter)];
-      payload.athletes.forEach(a => {
-        const notes = Array.from({ length: 6 }, (_, i) => a.notes?.[i] ?? {});
-        const noteParts = notes.flatMap(n => [n.dNote ?? '', n.endNote ?? '']);
-
-        lines.push(
-          [
-            a.groupIndex,
-            a.nachname,
-            a.vorname,
-            a.jg,
-            a.verein,
-            a.kat,
-            ...noteParts,
-          ]
-            .map(v => (v ?? '').toString().replace(/\r?\n/g, ' ').trim())
-            .join(delimiter)
-        );
-      });
-
-      const csv = lines.join('\n');
-      this.state.loadNotesCsvText(csv, delimiter);
-      this.errorMsg = '';
-    } catch (err: any) {
-      this.errorMsg =
-        err?.message || 'Import fehlgeschlagen. Bitte gültige JSON-Datei wählen.';
-    } finally {
-      input.value = '';
-    }
+  /** Speichert die PDF-Antwort als Download; Dateiname aus Content-Disposition, sonst Fallback. */
+  private downloadPdfResponse(res: HttpResponse<Blob>, fallbackFilename: string): void {
+    const blob = res.body!;
+    const filename = filenameFromContentDisposition(
+      res.headers.get('Content-Disposition'),
+      fallbackFilename
+    );
+    downloadBlob(blob, filename);
   }
 }

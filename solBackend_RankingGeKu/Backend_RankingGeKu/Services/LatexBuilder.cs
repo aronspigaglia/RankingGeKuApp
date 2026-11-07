@@ -3,6 +3,7 @@ using Backend_RankingGeKu.Models;
 
 namespace Backend_RankingGeKu.Services;
 
+/// <summary>Erzeugt das LaTeX-Dokument für die Notenblätter (eine Tabelle pro Sektion).</summary>
 public class LatexBuilder
 {
     public string BuildMany(List<(string Title, List<AthleteDto> Data)> sections)
@@ -31,8 +32,8 @@ public class LatexBuilder
 
         return WrapDocument(body.ToString());
     }
-    
-    private static string WrapDocument(string body) => 
+
+    private static string WrapDocument(string body) =>
 $@"\documentclass[a4paper,10pt,landscape]{{article}}
 \usepackage[margin=12mm]{{geometry}}
 \usepackage{{booktabs,longtable}}
@@ -57,43 +58,28 @@ $@"\documentclass[a4paper,10pt,landscape]{{article}}
         var sb = new StringBuilder();
         foreach (var a in data)
         {
-            sb.AppendLine($"{E(a.Nachname)} & {E(a.Vorname)} & {E(a.JG)} & {E(a.Verein)} & {E(a.Kat)} & & \\\\ \\hline");
+            sb.AppendLine(
+                $"{E(a.Nachname)} & {E(a.Vorname)} & {E(a.JG)} & {E(a.Verein)} & {E(a.Kat)} & & \\\\ \\hline");
         }
         return sb.ToString();
     }
 
+    /// <summary>Titel zweizeilig: erste Zeile (Gerät) groß und fett, Rest leicht kleiner darunter.</summary>
     private static string FormatTitle(string title)
     {
-        var parts = title
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .ToArray();
+        var parts = title.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         if (parts.Length == 0)
             return string.Empty;
 
-        var first = E(parts[0]); // Apparatur: groß & fett
+        var first = E(parts[0]);
 
         if (parts.Length == 1)
             return $@"{{\LARGE \textbf{{{first}}}}}";
 
-        // Zweite Zeile leicht kleiner + etwas Abstand
         var rest = string.Join(@"\\", parts.Skip(1).Select(E));
         return $@"{{\LARGE \textbf{{{first}}}}}\\[3mm]{{\Large {rest}}}";
     }
 
-    private static string E(string? s)
-    {
-        if (string.IsNullOrEmpty(s)) return "";
-        return s
-            .Replace(@"\", @"\textbackslash{}")
-            .Replace("&", @"\&")
-            .Replace("%", @"\%")
-            .Replace("$", @"\$")
-            .Replace("#", @"\#")
-            .Replace("_", @"\_")
-            .Replace("{", @"\{")
-            .Replace("}", @"\}")
-            .Replace("~", @"\textasciitilde{}")
-            .Replace("^", @"\textasciicircum{}");
-    }
+    private static string E(string? s) => LatexEscaper.Escape(s);
 }
